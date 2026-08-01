@@ -25,6 +25,14 @@ The architecture establishes a boundary between:
 
 This profile describes how EGA/SIF satisfies the EABC requirements without defining EABC itself.
 
+## Terminology Note
+
+The theoretical foundation of this profile — the *Execution Authority* research whitepaper — defines a single portable authority artifact, the **Authorization Artifact (ACT)**, presented by a Decision Authority to an Execution Authority.
+
+Within EGA/SIF, the responsibilities carried by that single artifact are realized across three architectural stages: the **Authorization Object (AO)**, the **Authorization Execution Envelope (AEE)**, and the **Execution Control Token (ECT)**. Taken together, **AO + AEE + ECT realize the whitepaper's Authorization Artifact (ACT)**; no single EGA/SIF component is individually equivalent to it.
+
+To avoid ambiguity between the whitepaper's ACT (Authorization Artifact) and this profile's token, the final pipeline artifact presented to the Commit Gate is named the **Execution Control Token (ECT)** in this and all subsequent EGA/SIF documents, rather than reusing the abbreviation ACT.
+
 ---
 
 # 2. Architectural Overview
@@ -50,7 +58,7 @@ Authorization Execution Envelope (AEE)
 
         ▼
 
-Authorization Control Token (ACT)
+Execution Control Token (ECT)
 
         │
 
@@ -63,9 +71,15 @@ Commit Gate
         ▼
 
 Execution Domain
+
+        │
+
+        ▼
+
+Execution Attestation (EAtt)
 ```
 
-The architecture creates an explicit transition point between authorization intent and externally committed execution.
+The architecture creates an explicit transition point between authorization intent and externally committed execution. The Commit Gate's output is emitted as an **Execution Attestation (EAtt)**, the same evidentiary artifact defined in the whitepaper (Section 9) — see Section 6 below for its evidence mapping.
 
 ---
 
@@ -73,15 +87,15 @@ The architecture creates an explicit transition point between authorization inte
 
 Within EGA/SIF, the execution-authority boundary is represented by the transition between:
 
-* the authorization domain producing an execution authorization artifact;
-* the enforcement domain validating and committing execution.
+* the authorization domain producing an execution authorization artifact (AO + AEE + ECT);
+* the enforcement domain validating and committing execution, and issuing the resulting Execution Attestation (EAtt).
 
 The boundary is responsible for ensuring that:
 
 * execution authority is explicit;
 * authorization context is preserved;
 * execution conditions are evaluated;
-* committed actions remain traceable.
+* committed actions remain traceable, from originating AO through to the issued EAtt.
 
 ---
 
@@ -101,10 +115,10 @@ Typical information includes:
 EABC Mapping:
 
 | EABC Requirement     | AO Contribution            |
-| -------------------- | -------------------------- |
-| State Binding        | Decision context reference |
-| Context Binding      | Authorization scope        |
-| Evidence Correlation | Decision identifier        |
+| --------------------- | --------------------------- |
+| State Binding         | Decision context reference |
+| Context Binding       | Authorization scope        |
+| Evidence Correlation  | Decision identifier        |
 
 ---
 
@@ -121,17 +135,17 @@ Typical information includes:
 
 EABC Mapping:
 
-| EABC Requirement     | AEE Contribution      |
-| -------------------- | --------------------- |
-| Context Binding      | Execution constraints |
-| State Binding        | Context references    |
-| Evidence Correlation | Lifecycle identifiers |
+| EABC Requirement     | AEE Contribution       |
+| --------------------- | ----------------------- |
+| Context Binding       | Execution constraints  |
+| State Binding         | Context references     |
+| Evidence Correlation  | Lifecycle identifiers  |
 
 ---
 
-## Authorization Control Token (ACT)
+## Execution Control Token (ECT)
 
-The Authorization Control Token represents the execution-authority assertion presented to the enforcement boundary.
+The Execution Control Token represents the execution-authority assertion presented to the enforcement boundary. Together with the AO and AEE that precede it, it realizes the whitepaper's Authorization Artifact (ACT) (see Section 1, Terminology Note).
 
 Typical information includes:
 
@@ -139,16 +153,16 @@ Typical information includes:
 * authority chain;
 * validity interval;
 * integrity protection;
-* references to originating authorization material.
+* references to originating authorization material (AO, AEE).
 
 EABC Mapping:
 
-| EABC Requirement                | ACT Contribution        |
-| ------------------------------- | ----------------------- |
-| Independent Execution Authority | Authority assertion     |
-| Evidence Integrity              | Protected artifact      |
-| Context Binding                 | Execution scope         |
-| Evidence Correlation            | Authorization reference |
+| EABC Requirement                | ECT Contribution         |
+| --------------------------------- | -------------------------- |
+| Independent Execution Authority  | Authority assertion        |
+| Evidence Integrity               | Protected artifact         |
+| Context Binding                  | Execution scope            |
+| Evidence Correlation             | Authorization reference    |
 
 ---
 
@@ -156,30 +170,30 @@ EABC Mapping:
 
 The Commit Gate represents the execution transition control point.
 
-It evaluates whether the authorized action may transition into an externally committed effect.
+It evaluates whether the authorized action may transition into an externally committed effect, and upon commit issues an **Execution Attestation (EAtt)** binding the ECT, the commit event, and the execution outcome.
 
 EABC Mapping:
 
-| EABC Requirement               | Commit Gate Contribution     |
-| ------------------------------ | ---------------------------- |
-| Complete Mediation             | Execution transition control |
-| Deterministic Commit Semantics | Commit outcome               |
-| Execution Evidence             | Commit result                |
+| EABC Requirement                | Commit Gate Contribution      |
+| --------------------------------- | -------------------------------- |
+| Complete Mediation                | Execution transition control     |
+| Deterministic Commit Semantics    | Commit outcome                   |
+| Execution Evidence                | Execution Attestation (EAtt)     |
 
 ---
 
 # 5. Property Mapping
 
 | EABC Property                   | EGA/SIF Mechanism                                       |
-| ------------------------------- | ------------------------------------------------------- |
-| Independent Execution Authority | Separation between authorization domain and Commit Gate |
-| Complete Mediation              | Commit Gate controlled execution transition             |
-| Deterministic Commit Semantics  | Explicit commit result                                  |
-| Context Binding                 | AEE and ACT execution context                           |
-| State Binding                   | AO references and decision records                      |
-| Evidence Integrity              | Signed authorization artifacts                          |
-| Evidence Correlation            | Shared lifecycle and correlation identifiers            |
-| Failure Semantics               | Explicit authorization and execution outcomes           |
+| --------------------------------- | ---------------------------------------------------------- |
+| Independent Execution Authority  | Separation between authorization domain and Commit Gate    |
+| Complete Mediation                | Commit Gate controlled execution transition                |
+| Deterministic Commit Semantics    | Explicit commit result, recorded in the EAtt               |
+| Context Binding                   | AEE and ECT execution context                              |
+| State Binding                     | AO references and decision records                         |
+| Evidence Integrity                | Signed authorization artifacts and signed EAtt             |
+| Evidence Correlation              | Shared lifecycle and correlation identifiers (AO→AEE→ECT→EAtt) |
+| Failure Semantics                 | Explicit authorization and execution outcomes in the EAtt   |
 
 ---
 
@@ -201,7 +215,7 @@ Provided through:
 
 Provided through:
 
-* Authorization Control Token;
+* Execution Control Token (ECT);
 * validity conditions;
 * authority chain.
 
@@ -209,11 +223,12 @@ Provided through:
 
 ## Execution Evidence
 
-Provided through:
+Provided through the **Execution Attestation (EAtt)**, issued by the Commit Gate, containing:
 
-* Commit Gate result;
+* commit result;
 * execution attempt record;
-* execution outcome.
+* execution outcome;
+* reference to the ECT that authorized the commit.
 
 ---
 
@@ -222,8 +237,8 @@ Provided through:
 Provided through:
 
 * lifecycle identifier;
-* authorization identifier;
-* execution identifier.
+* authorization identifier (AO / AEE / ECT);
+* execution identifier (EAtt).
 
 ---
 
@@ -231,7 +246,8 @@ Provided through:
 
 Provided through:
 
-* signed artifacts;
+* signed artifacts (AO, AEE, ECT);
+* signed Execution Attestation (EAtt);
 * integrity references;
 * protected authorization records.
 
@@ -256,12 +272,12 @@ Execution Attempt
 
         ▼
 
-Commit Result
+Commit Result (Execution Attestation / EAtt)
 ```
 
-or bind authorization and commit into a single atomic transition where the implementation provides equivalent evidence.
+or bind authorization and commit into a single atomic transition where the implementation provides equivalent evidence, still issuing an EAtt upon commit.
 
-In both cases, authorization and execution semantics remain distinguishable.
+In both cases, authorization and execution semantics remain distinguishable, and the resulting EAtt remains traceable back to its originating ECT.
 
 ---
 
@@ -276,7 +292,7 @@ EGA/SIF implementations SHOULD explicitly represent:
 * execution failed;
 * execution unavailable.
 
-Failure states MUST NOT be interpreted as successful execution.
+Failure states MUST NOT be interpreted as successful execution, and MUST be recorded as such in the Execution Attestation (or in an equivalent failure record when no commit occurs).
 
 ---
 
@@ -285,9 +301,9 @@ Failure states MUST NOT be interpreted as successful execution.
 This profile declares that EGA/SIF v1 satisfies the EABC contract through:
 
 * explicit execution-authority separation;
-* evidence-backed authorization artifacts;
-* controlled execution transition;
-* traceable execution outcomes.
+* evidence-backed authorization artifacts (AO, AEE, ECT), jointly realizing the whitepaper's Authorization Artifact (ACT);
+* controlled execution transition via the Commit Gate;
+* traceable execution outcomes recorded as Execution Attestations (EAtt).
 
 A specific EGA/SIF implementation SHOULD publish additional deployment-specific evidence mappings.
 
@@ -313,8 +329,8 @@ EGA/SIF v1 represents one implementation profile of the Execution Authority Boun
 
 It demonstrates how an execution-authority architecture can satisfy EABC requirements while preserving separation between:
 
-* authorization intent,
-* execution authority,
-* committed external effects.
+* authorization intent (AO, AEE),
+* execution authority (ECT, Commit Gate),
+* committed external effects (Execution Attestation / EAtt).
 
 Future architectures may implement the same contract through different mechanisms while remaining interoperable at the boundary level.
