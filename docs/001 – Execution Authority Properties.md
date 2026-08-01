@@ -16,18 +16,18 @@ Implementations are free to choose their internal architecture provided they can
 
 EABC is not a freestanding property list. It operationalizes two distinct layers of the *Execution Authority* research whitepaper:
 
-* the **five necessary properties of an Execution Authority** established in the whitepaper's theoretical foundation (Independence, Complete Mediation, Commit Control, Determinism, State/Context Binding) — referenced in the whitepaper's Section 12.1 as the properties "defined in Chapter 1";
+* the **five necessary properties of an Execution Authority** established in the whitepaper's theoretical foundation (Independence, Complete Mediation, Commit Control, Determinism, State/Context Binding) — referenced in the whitepaper's Section 12.1 as the properties "defined in Section 3";
 * the **operationalization layer** of the whitepaper (Sections 8–11: the Authorization Artifact, the Execution Attestation, the Verification Model, and the Assurance Registry), which introduces evidentiary and lifecycle requirements not present in the theoretical layer itself.
 
 Properties 1–5 below correspond directly to the whitepaper's five necessary properties. Properties 6–9 operationalize requirements that the whitepaper establishes structurally (through the ACT and EAtt artifacts and the verification model) but does not itself enumerate as named axioms. Property 10 is specific to EABC as a specification layer and has no whitepaper counterpart.
 
 | EABC Property                     | Origin |
 | ----------------------------------- | -------- |
-| 1. Independent Execution Authority | Whitepaper Chapter 1 — Independence |
-| 2. Complete Mediation               | Whitepaper Chapter 1 — Complete Mediation |
-| 3. Deterministic Commit Semantics   | Whitepaper Chapter 1 — Determinism and Commit Control |
-| 4. Context Binding                  | Whitepaper Chapter 1 — State/Context Binding (context component); operationalized via the ACT `context`/`constraints` fields (Section 8.3) |
-| 5. State Binding                    | Whitepaper Chapter 1 — State/Context Binding (state component); operationalized via the ACT `validity` field and EAtt `execution_context` (Sections 8.3, 9.3) |
+| 1. Independent Execution Authority | Whitepaper Section 3 — Independence |
+| 2. Complete Mediation               | Whitepaper Section 3 — Complete Mediation |
+| 3. Deterministic Commit Semantics   | Whitepaper Section 3 — Determinism and Commit Control |
+| 4. Context Binding                  | Whitepaper Section 3 — State/Context Binding (context component); operationalized via the ACT `context`/`constraints` fields (Section 8.3) |
+| 5. State Binding                    | Whitepaper Section 3 — State/Context Binding (state component); operationalized via the ACT `validity` field and EAtt `execution_context` (Sections 8.3, 9.3) |
 | 6. Evidence Integrity               | Operationalization layer — EAtt `integrity` field (Section 9.3) |
 | 7. Evidence Correlation             | Operationalization layer — EAtt causal binding to ACT_hash (Section 9.4) |
 | 8. Failure Semantics                | Operationalization layer — Verification Outcome (Section 10.5) and EAtt `result` field (Section 9.3) |
@@ -112,7 +112,7 @@ Consumers must be able to distinguish:
 
 without ambiguity.
 
-This property operationalizes the whitepaper's Determinism and Commit Control properties (Chapter 1), which govern the atomic validated-to-committed transition referenced in the EAtt `commit_event` field (Section 9.3).
+This property operationalizes the whitepaper's Determinism and Commit Control properties (Section 3), which govern the atomic validated-to-committed transition referenced in the EAtt `commit_event` field (Section 9.3).
 
 ## Evidence
 
@@ -137,7 +137,7 @@ Execution authority MUST NOT be reusable outside its intended scope.
 
 Execution authority without context binding can be replayed or misapplied.
 
-This property operationalizes the context component of the whitepaper's State/Context Binding property (Chapter 1), corresponding to the `constraints` and `context` fields of the Authorization Artifact (Section 8.3).
+This property operationalizes the context component of the whitepaper's State/Context Binding property (Section 3), corresponding to the `constraints` and `context` fields of the Authorization Artifact (Section 8.3).
 
 ## Evidence
 
@@ -163,7 +163,7 @@ Consumers MUST be able to determine whether execution occurred against the inten
 
 Authorization decisions are meaningful only within the state in which they were evaluated.
 
-This property operationalizes the state component of the whitepaper's State/Context Binding property (Chapter 1), corresponding to the `validity` field of the Authorization Artifact and the `execution_context` field of the Execution Attestation (Sections 8.3, 9.3).
+This property operationalizes the state component of the whitepaper's State/Context Binding property (Section 3), corresponding to the `validity` field of the Authorization Artifact and the `execution_context` field of the Execution Attestation (Sections 8.3, 9.3).
 
 ## Evidence
 
@@ -189,7 +189,7 @@ Consumers MUST be able to determine whether evidence has been modified.
 
 Execution authority depends on trustworthy evidence rather than trust in implementation.
 
-This property operationalizes the `integrity` field of the whitepaper's Execution Attestation (Section 9.3); it belongs to the whitepaper's operationalization layer rather than to the Chapter 1 theoretical properties.
+This property operationalizes the `integrity` field of the whitepaper's Execution Attestation (Section 9.3); it belongs to the whitepaper's operationalization layer rather than to the Section 3 theoretical properties.
 
 ## Evidence
 
@@ -292,15 +292,15 @@ A conforming implementation demonstrates:
 
 | Property                        | Required | Whitepaper Origin |
 | --------------------------------- | ---------- | -------------------- |
-| Independent Execution Authority  | MUST       | Chapter 1 — Independence |
-| Complete Mediation                | MUST       | Chapter 1 — Complete Mediation |
-| Deterministic Commit Semantics    | MUST       | Chapter 1 — Determinism / Commit Control |
-| Context Binding                   | MUST       | Chapter 1 — State/Context Binding (context) |
-| State Binding                     | MUST       | Chapter 1 — State/Context Binding (state) |
+| Independent Execution Authority  | MUST       | Section 3 — Independence |
+| Complete Mediation                | MUST       | Section 3 — Complete Mediation |
+| Deterministic Commit Semantics    | MUST       | Section 3 — Determinism / Commit Control |
+| Context Binding                   | MUST       | Section 3 — State/Context Binding (context) |
+| State Binding                     | MUST       | Section 3 — State/Context Binding (state) |
 | Evidence Integrity                | MUST       | Operationalization layer — EAtt |
 | Evidence Correlation              | MUST       | Operationalization layer — EAtt |
 | Failure Semantics                 | MUST       | Operationalization layer — Verification Model |
 | Implementation Neutrality         | MUST       | Section 5.4 — Technology Neutrality |
 | Extensible Profiles               | MUST       | EABC-specific (Section 12.4 expectation) |
 
-Conformance is determined by satisfying these architectural properties, regardless of implementation architecture. Where a property traces to the whitepaper's Chapter 1, conformance with that property is a conformance claim about the underlying theory, not only about this specification.
+Conformance is determined by satisfying these architectural properties, regardless of implementation architecture. Where a property traces to the whitepaper's Section 3, conformance with that property is a conformance claim about the underlying theory, not only about this specification.
