@@ -14,6 +14,39 @@ Instead, it defines the minimum properties that an execution-authority system mu
 
 ---
 
+## Position in the Execution Authority Hierarchy
+
+EABC does not stand on its own. It is the middle layer of a three-layer hierarchy:
+
+```text
+Execution Authority (research whitepaper)
+        │   defines WHAT must be true — the five necessary
+        │   properties of an Execution Authority (Chapter 1),
+        │   the Authorization Artifact (ACT) and Execution
+        │   Attestation (EAtt) artifacts, and the verification
+        │   and assurance model (Sections 8–11)
+        ▼
+Execution Authority Boundary Contract (EABC — this repository)
+        │   defines the CONTRACT — normative properties (see
+        │   001), an evidence model (see 002), execution and
+        │   failure semantics (see 003), and conformance
+        │   requirements (see 004), each traceable to the
+        │   whitepaper's invariants
+        ▼
+Implementation Profiles (e.g. EGA/SIF v1)
+        │   define HOW a concrete architecture satisfies the
+        │   contract — mapping its own components and evidence
+        │   artifacts onto EABC's normative requirements
+        ▼
+Concrete Implementations
+```
+
+The relationship between layers is intentionally asymmetric, as established in the whitepaper's Section 12.4: EABC is answerable to the whitepaper's invariants, but the whitepaper's validity does not depend on any particular choice made in EABC or in a given profile. Multiple divergent specifications could in principle satisfy the same theoretical requirements; EABC is offered as one such specification.
+
+Each normative property defined in this specification (see **001 – Execution Authority Properties**) is traceable either to the whitepaper's Chapter 1 (the five necessary properties of an Execution Authority) or to its operationalization layer (the ACT/EAtt artifacts and verification model, Sections 8–11). Where a property has no whitepaper counterpart, it is specific to EABC as a specification layer, per the whitepaper's own expectation that implementation-level questions be resolved downstream of the theory.
+
+---
+
 ## Motivation
 
 Modern autonomous systems increasingly separate decision-making from execution.
@@ -120,7 +153,7 @@ An implementation profile typically maps:
 
 onto the normative EABC requirements.
 
-Multiple independent architectures may conform to the same EABC specification.
+Multiple independent architectures may conform to the same EABC specification. The reference profile, **EGA/SIF v1**, maps its Authorization Object (AO), Authorization Execution Envelope (AEE), and Execution Control Token (ECT) — which together realize the whitepaper's Authorization Artifact (ACT) — and its Commit Gate's Execution Attestation (EAtt) onto the requirements defined here.
 
 ---
 
