@@ -46,6 +46,16 @@ Evidence SHOULD remain meaningful outside the implementation that produced it.
 
 ---
 
+## Intrinsically Bound
+
+Any identifier that correlates one piece of evidence to another — in particular, an identifier linking Execution Evidence back to the Decision or Identity Evidence that authorized it — MUST be covered by the same Integrity Evidence that protects the artifact in which it appears.
+
+Correlation MUST NOT depend on an external mapping, index, or side channel that is not itself integrity-protected as part of the evidence artifact it correlates. An independent consumer MUST be able to verify provenance directly from the evidence artifact, without relying on a separately maintained and separately trusted correlation record.
+
+This principle exists specifically to close a gap that a correlation identifier alone does not: correlation without intrinsic integrity protection describes a relationship, but does not prove it.
+
+---
+
 # Evidence Categories
 
 EABC groups evidence into logical categories rather than prescribing concrete fields.
@@ -132,6 +142,9 @@ Examples include:
 * execution result
 * execution status
 * failure reason
+* a correlation reference to the Decision Evidence that authorized the execution (see Correlation Evidence, below)
+
+Execution Evidence MUST carry a correlation reference to its originating Decision Evidence, and that reference MUST fall within the scope of the Integrity Evidence protecting the Execution Evidence artifact. An Execution Evidence artifact whose correlation reference is not itself integrity-protected does not satisfy this category.
 
 ---
 
@@ -147,6 +160,8 @@ Typical correlation artifacts include:
 * sequence identifier
 * transaction identifier
 
+Correlation Evidence is not a standalone category that may be provided separately from the evidence it correlates. Where a correlation identifier references another piece of evidence — most importantly, where it binds Execution Evidence back to the Decision Evidence that authorized it — that identifier MUST be embedded within, and covered by, the Integrity Evidence of the artifact carrying it (see "Intrinsically Bound," above). A correlation mapping maintained outside the evidence artifacts themselves — for example, in a separate index or log not covered by the same integrity mechanism — does not satisfy this requirement, because an independent consumer would then be trusting the mapping rather than verifying the binding.
+
 ---
 
 ## 8. Integrity Evidence
@@ -160,7 +175,7 @@ Possible mechanisms include:
 * authenticated logs
 * immutable event chains
 
-EABC does not mandate any specific integrity mechanism.
+EABC does not mandate any specific integrity mechanism. Where Integrity Evidence protects an artifact that also carries a Correlation Evidence reference (per category 7), that reference is within the scope of what must be protected — a signature or hash that omits the correlation reference does not satisfy Evidence Correlation for that artifact.
 
 ---
 
@@ -168,16 +183,16 @@ EABC does not mandate any specific integrity mechanism.
 
 For every normative property defined by EABC, implementations MUST provide sufficient evidence to demonstrate compliance.
 
-| Property                        | Required Evidence               |
-| ------------------------------- | ------------------------------- |
-| Independent Execution Authority | Identity + Integrity            |
-| Complete Mediation              | Decision + Commit + Correlation |
-| Deterministic Commit Semantics  | Decision + Commit + Execution   |
-| Context Binding                 | Context                         |
-| State Binding                   | State                           |
-| Evidence Integrity              | Integrity                       |
-| Evidence Correlation            | Correlation                     |
-| Failure Semantics               | Execution + Decision            |
+| Property                        | Required Evidence                                                 |
+| --------------------------------- | ---------------------------------------------------------------- |
+| Independent Execution Authority  | Identity + Integrity                                              |
+| Complete Mediation                | Decision + Commit + Correlation (intrinsically bound, per above)  |
+| Deterministic Commit Semantics    | Decision + Commit + Execution                                     |
+| Context Binding                   | Context                                                            |
+| State Binding                     | State                                                              |
+| Evidence Integrity                | Integrity                                                          |
+| Evidence Correlation              | Correlation, intrinsically bound within Integrity Evidence — not satisfied by an external mapping |
+| Failure Semantics                 | Execution + Decision                                               |
 
 ---
 
@@ -191,6 +206,8 @@ Consumers SHOULD distinguish between:
 * evidence incomplete
 * evidence unverifiable
 * evidence inconsistent
+
+An Execution Evidence artifact that lacks an intrinsically bound correlation reference to its Decision Evidence SHOULD be treated as evidence incomplete, not as an implicit authorization.
 
 The interpretation of missing evidence is implementation-independent.
 
@@ -223,9 +240,10 @@ A consumer should be capable of determining:
 * against which state,
 * within which context,
 * whether execution occurred,
-* whether evidence remains trustworthy.
+* whether evidence remains trustworthy,
+* whether the execution evidence can be verifiably traced back to the authorization that permitted it.
 
-No implementation-specific interpretation should be required to answer these questions.
+No implementation-specific interpretation should be required to answer these questions. In particular, the last question MUST be answerable from the execution evidence artifact alone, without consulting a separately trusted correlation source.
 
 ---
 
@@ -233,4 +251,4 @@ No implementation-specific interpretation should be required to answer these que
 
 Implementation profiles define how concrete architectures generate evidence satisfying the EABC evidence model.
 
-Different implementations may expose different artifacts while remaining fully conformant, provided they demonstrate the required evidence categories and satisfy the normative execution-authority properties.
+Different implementations may expose different artifacts while remaining fully conformant, provided they demonstrate the required evidence categories, satisfy the normative execution-authority properties, and satisfy the intrinsic-binding requirement for any correlation reference between authorization and execution evidence.
