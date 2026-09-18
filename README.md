@@ -220,4 +220,10 @@ The objective is to establish an open contract that multiple independent archite
 
 # License
 
-See repository license for terms of use and contribution.
+The EABC specification, documentation, profiles, and examples in this repository are licensed under the **Creative Commons Attribution 4.0 International (CC BY 4.0)** license.
+
+See [LICENSE](./LICENSE) for the full terms.
+
+Copyright © 2026 Equinibrium.
+
+This repository license does not grant rights to trademarks, patents, or other intellectual property that may be separately protected.
