@@ -23,7 +23,6 @@ EABC defines the boundary contract, not a specific implementation.
 The documentation is organized into the following layers:
 
 ```text
- id="4u0x9j"
 Architecture Principles
         │
         ▼
@@ -112,7 +111,7 @@ This document defines how compliance can be independently evaluated.
 
 **File:**
 
-`003-failure-and-execution-semantics.md`
+`003-failure-semantics.md`
 
 Defines the meaning of authorization and execution states.
 

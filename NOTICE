@@ -1,0 +1,29 @@
+Execution Authority Boundary Contract (EABC)
+Copyright 2026 Equinibrium
+
+This repository contains the Execution Authority Boundary Contract (EABC)
+specification, documentation, implementation profiles, and illustrative
+examples developed by Equinibrium.
+
+Unless otherwise stated, the contents of this repository are licensed under
+the Apache License, Version 2.0.
+
+The EABC specification is implementation-independent. This repository does
+not include or distribute any proprietary implementation of an EABC-conformant
+execution-authority boundary.
+
+In particular, the Semantic Logic Core (SLC), hardware-native implementations,
+and other proprietary implementations developed separately by Equinibrium are
+not contained in this repository and are not licensed by this repository.
+
+Nothing in this repository grants rights to trademarks, trade names, or other
+intellectual property that is not expressly licensed under the applicable
+license.
+
+Patent rights are governed by Section 3 of the Apache License, Version 2.0.
+No additional patent license is granted by this NOTICE beyond the rights
+expressly provided by the applicable license.
+
+The absence of a proprietary implementation from this repository does not
+restrict independent implementations of the EABC specification from being
+developed by third parties under the terms of the applicable license.
