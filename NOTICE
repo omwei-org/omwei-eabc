@@ -12,9 +12,15 @@ The EABC specification is implementation-independent. This repository does
 not include or distribute any proprietary implementation of an EABC-conformant
 execution-authority boundary.
 
-In particular, the Semantic Logic Core (SLC), hardware-native implementations,
-and other proprietary implementations developed separately by Equinibrium are
-not contained in this repository and are not licensed by this repository.
+The repository may contain implementation profiles, architectural descriptions,
+and interface mappings that describe or reference EGA/SIF, SLC, or other
+implementation approaches. Such descriptive and specification material is
+licensed under the applicable repository license.
+
+The Semantic Logic Core (SLC) implementation itself, including proprietary
+hardware-native implementations and other proprietary implementation code or
+technology developed separately by Equinibrium, is not contained in this
+repository and is not licensed by this repository.
 
 Nothing in this repository grants rights to trademarks, trade names, or other
 intellectual property that is not expressly licensed under the applicable
