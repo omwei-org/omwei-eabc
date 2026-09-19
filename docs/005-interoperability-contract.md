@@ -58,6 +58,10 @@ For the currently validated implementation pair, the implementation-side `epoch`
 
 This mapping is an implementation mapping, not a requirement that every implementation name the field `epoch`.
 
+The current implementation pair also exposes the same authority-epoch value under different implementation-side names at different points in the path. These names MUST NOT be collapsed into a single EABC concept merely because the value is numerically identical.
+
+In the current pair, the authority-side source is `authority_epoch`; it is carried through an implementation-side field named `execution_epoch`; and the commit gate stores it as `governance_epoch`. The interoperability meaning remains **authority epoch**.
+
 ---
 
 ## 4. Authorization decision mapping
@@ -74,19 +78,35 @@ An interoperating implementation MAY use different local terminology, but the ma
 
 ### 4.1 Known implementation mapping
 
-The currently validated implementation pair uses:
+The first real interoperability run established `ALLOW` directly and established an implementation-side `BLOCK` result for a revoked command.
 
-| EABC semantic outcome | Implementation-side outcome |
-|---|---|
-| `ALLOW` | `ALLOW` |
-| `DENY` | `BLOCK` |
-| `EXPIRED` | not yet validated |
-| `CANCELLED` | not yet validated |
-| `UNKNOWN` | not yet validated |
+The implementation owner has additionally identified the following finer-grained mapping for its seven local controller outcomes. This mapping is recorded here as an **implementation mapping to be preserved and independently validated through the corresponding evidence**, rather than as a change to the EABC core vocabulary:
 
-The mapping `DENY ↔ BLOCK` is therefore recorded as a **known implementation mapping**, not as a replacement of the EABC normative term `DENY`.
+| EABC semantic outcome | Implementation-side outcome | Mapping status |
+|---|---|---|
+| `ALLOW` | `ALLOW` | validated in Run 001 |
+| `DENY` | `BLOCK` | validated in Run 001 |
+| `DENY` | `MALFORMED_EXECUTION_OBJECT` | implementation mapping; pending independent evidence |
+| `DENY` | `EFFECTOR_FAILURE` | implementation mapping; pending independent evidence |
+| `EXPIRED` | `STALE_EPOCH` | implementation mapping; pending independent evidence |
+| `CANCELLED` | `REVOKED` | implementation mapping; pending independent evidence |
+| `UNKNOWN` | `AUTHORITY_REFUSAL` | implementation mapping; pending independent evidence |
+| outside authorization vocabulary | `UNSERIALIZABLE_COMMAND` | controller-side refusal before authority decision |
+| outside authorization vocabulary | `EVIDENCE_UNAVAILABLE` | controller-side refusal before/after authority decision, not itself an authority decision |
 
-A future implementation MAY use another local term, provided its mapping is published and unambiguous.
+The important distinction is between **authority outcomes** and **controller-side refusals**. `UNSERIALIZABLE_COMMAND` and `EVIDENCE_UNAVAILABLE` MUST NOT be dressed as EABC authorization decisions merely because the controller refused to proceed.
+
+Likewise, `AUTHORITY_REFUSAL` is mapped to `UNKNOWN` because the authority decision could not be obtained. It MUST NOT be represented as `DENY`, because doing so would falsely imply that an authority decision was actually made.
+
+The mappings above are implementation mappings, not new EABC authorization outcomes. In particular, `STALE_EPOCH` does not become a sixth EABC outcome merely because the implementation uses that code.
+
+### 4.2 Mapping discipline
+
+A local outcome code MUST be mapped according to its observed semantics, not by name alone.
+
+Where evidence is insufficient to establish the mapping, the correct status is **not yet validated**.
+
+A controller-side refusal that occurs before an EABC authority decision exists MUST NOT be represented as an EABC authorization outcome.
 
 ---
 
@@ -100,6 +120,8 @@ For the currently validated implementation pair:
 - authorization blocked: `reason` contains the explicit implementation reason, for example `REVOKED`.
 
 The empty-string convention is recorded as an **observed interoperability convention** from the real run. It is not currently imposed as a universal EABC requirement on all implementations.
+
+The fact that the empty-string rule was independently derived by recomputing the observed integrity values, rather than inferred from an informal description of the implementation, is part of the provenance for treating this as an unambiguous serialization rule for the current pair.
 
 If a future interoperability version requires a canonical wire representation for `reason`, that requirement MUST be established independently of any one implementation.
 
@@ -212,7 +234,14 @@ This section is intentionally extensible.
 | Semantic element | Current implementation mapping | Status |
 |---|---|---|
 | EABC `DENY` | `BLOCK` | validated |
-| EABC authority epoch | implementation `epoch` | validated |
+| EABC `DENY` | `MALFORMED_EXECUTION_OBJECT` | pending evidence |
+| EABC `DENY` | `EFFECTOR_FAILURE` | pending evidence |
+| EABC `EXPIRED` | `STALE_EPOCH` | pending evidence |
+| EABC `CANCELLED` | `REVOKED` | pending evidence |
+| EABC `UNKNOWN` | `AUTHORITY_REFUSAL` | pending evidence |
+| Controller-side refusal outside EABC authorization vocabulary | `UNSERIALIZABLE_COMMAND` | observed implementation classification; evidence to be correlated |
+| Controller-side refusal outside EABC authorization vocabulary | `EVIDENCE_UNAVAILABLE` | observed implementation classification; evidence to be correlated |
+| EABC authority epoch | implementation `epoch` / `authority_epoch` / carried `execution_epoch` / stored `governance_epoch` | validated as same authority-epoch value in current pair |
 | EABC action digest | implementation `payload_digest` | validated |
 | EABC command identifier | `command_id` | validated |
 | No authorization reason | `reason = ""` | observed |
