@@ -59,7 +59,8 @@ The following JSON is reproduced verbatim from the two real journal entries supp
     "decision": "BLOCK",
     "reason": "REVOKED",
     "at": "2026-09-18T08:46:41.007Z",
-    "prev_hash": "36f37b56a641b91fa4921af6fe80aa3fce970ee583d3b8528a567ae59d67c6b8"
+    "prev_hash": "36f37b56a641b91fa4921af6fe80aa3fce970ee583d3b8528a567ae59d67c6b8",
+    "entry_hash": "715ebceb05f445adcc3280f21ed052ad256de73d5e11afb0d10540728aa9874a"
   }
 ]
 ```
