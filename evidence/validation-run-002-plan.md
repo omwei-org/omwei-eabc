@@ -87,6 +87,58 @@ Capture:
 - commit/execution timestamp
 - evidence integrity reference
 
+### 3.1 Required disambiguation: same authority vs. shared counter
+
+Before interpreting any result, the test protocol must establish which of the
+following actually occurred, because they are not equivalent:
+
+- **(a) Same-authority revocation**: the epoch increment reflects a change to
+  the specific authority governing this command (e.g. the issuing policy or
+  token was itself revoked/updated).
+- **(b) Shared-counter drift**: `epoch` is a global monotonic counter, and the
+  increment reflects an unrelated event elsewhere in the system that happens to
+  share the counter, with no actual change to the authority governing this
+  specific command.
+
+**Feasibility condition**: Scenario 2 (below) is only a valid shared-counter
+test if the implementation under test permits triggering an epoch increment
+without altering the authority relevant to the command being tested. If the
+implementation has no mechanism to do this — i.e. every epoch increment is, by
+construction, tied to an authority-relevant change — Scenario 2 cannot be
+constructed as designed. In that case, this must be recorded explicitly as
+**"shared-counter case not constructible in this implementation"**, and
+Scenario 1's result must be reported as unable to rule out the shared-counter
+alternative, rather than silently treated as if the disambiguation had been
+performed.
+
+Only case (a) speaks to the TOCTOU/authority-re-establishment question this run
+is meant to test. Case (b) would only demonstrate a granularity artifact of the
+`epoch` field, not a genuine authority-change event. **The test protocol must
+construct both cases separately** and record which one actually occurred for
+each observed result, rather than treating any epoch increment as equivalent
+evidence.
+
+### 3.2 Required disambiguation: fail-open vs. fail-closed
+
+The protocol must explicitly test and record the implementation's default
+behavior along this axis, independent of the specific outcome label it returns:
+
+- Does the implementation **fail closed** (re-validate authority at commit,
+  reject if changed) by default?
+- Does the implementation **fail open** (honor the prepare-time decision
+  regardless of subsequent authority change) by default?
+- Is the default configurable, and if so, what is it in the tested
+  configuration?
+
+**Scope limitation (must be preserved verbatim in the evidence record):**
+This run tests fail-open/fail-closed behavior with respect to authority change
+between prepare and commit. It does not, by itself, establish behavior when the
+verifier or authority service is unavailable. Authority revalidation
+(re-checking a live authority at commit) and general verifier-unavailability
+behavior are related but distinct properties; a result from this run must not
+be cited as evidence for the verifier-unavailable case without a separate,
+dedicated test.
+
 ## 4. Primary correlation check
 
 The reviewer must be able to establish:
@@ -103,7 +155,29 @@ prepare.authority_epoch != commit.authority_epoch
 
 The final authority epoch must be attributable to the final authorization/commit decision rather than inferred from an unrelated runtime value.
 
-## 5. Expected semantic interpretation
+## 5. Test matrix
+
+| Scenario | Prepare | Intervening event | Commit | Purpose |
+|---|---|---|---|---|
+| 1 | Authority epoch N | Same authority revoked; epoch N→N+1 | Same prepared command | Primary TOCTOU case |
+| 2 | Authority epoch N | Unrelated global epoch increment; authority governing command unchanged | Same prepared command | Shared-counter control |
+| 3 | Authority epoch N | Authority reaffirmed / no relevant change | Same prepared command | Baseline control |
+| 4 | Authority epoch N | Authority expires before commit | Same prepared command | Distinguish expiry from revocation |
+
+Scenario 2 is only valid if its feasibility condition in Section 3.1 is satisfied.
+
+Scenario 4 must distinguish an actual expiry event from revocation or other authority invalidation.
+
+**Note on Scenario 4**: if the implementation under test has no mechanism to
+distinguish expiry from revocation, or no expiry mechanism at all, the correct
+recorded result is **`NOT SUPPORTED / NOT OBSERVABLE`** — explicitly distinct
+from `UNKNOWN`. `UNKNOWN` means the implementation returned an outcome whose
+meaning is unclear; `NOT SUPPORTED / NOT OBSERVABLE` means the implementation
+has no code path capable of producing a distinguishable result for this
+scenario at all. Conflating the two would misrepresent a capability gap as an
+interpretability gap.
+
+## 6. Expected semantic interpretation
 
 If the authority changes from epoch N to N+1 before commit and the command is not reauthorized under N+1, the run should demonstrate that the previously prepared authorization does not by itself authorize the later external effect.
 
@@ -119,7 +193,7 @@ Do **not** add an implementation-specific outcome such as `STALE_EPOCH` to the E
 
 If the implementation returns `STALE_EPOCH`, record it first as the observed implementation outcome and determine its EABC mapping from the actual evidence.
 
-## 6. Negative control
+## 7. Negative control
 
 Where feasible, perform a second commit with a freshly authorized command after the authority transition.
 
@@ -139,7 +213,7 @@ fresh authorization under current state
 commit → outcome determined by current authority
 ```
 
-## 7. Failure and evidence handling
+## 8. Failure and evidence handling
 
 The run must distinguish:
 
@@ -153,7 +227,7 @@ Missing evidence must not be interpreted as successful execution.
 
 If the implementation cannot determine whether an external effect occurred, record `UNKNOWN` rather than inferring `FAILED` or `COMMITTED`.
 
-## 8. Evidence package
+## 9. Evidence package
 
 After execution, preserve:
 
@@ -172,7 +246,7 @@ After execution, preserve:
 
 The resulting record should become `evidence/validation-run-002.md` only after the run has actually occurred.
 
-## 9. Success criteria
+## 10. Success criteria
 
 The experiment is successful as an evidence run if an independent reviewer can determine from the preserved artifacts:
 
@@ -193,7 +267,7 @@ A successful experiment does not automatically imply a new EABC requirement. Its
 - implementation-specific behavior;
 - or evidence of a potentially missing EABC semantic.
 
-## 10. Constraints
+## 11. Constraints
 
 This run should not:
 
@@ -206,7 +280,7 @@ This run should not:
 
 The purpose is to test the boundary, not to design the result into the test.
 
-## 11. Relation to Validation Run 001
+## 12. Relation to Validation Run 001
 
 Run 001 established an observed pair:
 
@@ -230,7 +304,7 @@ what happens?
 
 This distinction is important. Run 001 demonstrates authority-context dependence across observed evaluations. Run 002 is intended to test whether that property is enforced across the prepare-to-commit temporal boundary.
 
-## 12. Current status
+## 13. Current status
 
 **Not executed.**
 
