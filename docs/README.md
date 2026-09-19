@@ -36,6 +36,9 @@ Execution Semantics
         │
         ▼
 Conformance Requirements
+        │
+        ▼
+Interoperability Contract
 ```
 
 Each document addresses a different aspect of the contract.
@@ -146,6 +149,31 @@ This document specifies:
 
 ---
 
+## 005 — Interoperability Contract
+
+**File:**
+
+`005-interoperability-contract.md`
+
+Defines the provisional interoperability layer between independent EABC implementations.
+
+This document specifies:
+
+* the boundary between EABC semantics and implementation mappings;
+* authority epoch and execution epoch semantics;
+* authorization outcome mappings;
+* correlation requirements;
+* integrity-mechanism neutrality;
+* commit-time interoperability semantics;
+* known implementation mappings;
+* validation and evolution requirements.
+
+**Status:** Draft v0.1 — Provisional.
+
+The current version has been validated against one implementation pair and one real interoperability run. It is intentionally not yet a stable universal wire contract.
+
+---
+
 # Implementation Profiles
 
 Concrete architectures are described separately from the core specification.
@@ -173,9 +201,10 @@ EABC separates:
 * architectural requirements from implementations;
 * execution authority from governance decisions;
 * evidence from assumptions;
-* conformance from implementation similarity.
+* conformance from implementation similarity;
+* normative semantics from interoperability mappings.
 
-This separation allows different architectures to interoperate through a shared execution-authority contract.
+This separation allows different architectures to interoperate through a shared execution-authority contract without requiring them to share the same internal implementation.
 
 ---
 
@@ -189,6 +218,7 @@ Feedback should focus on:
 * evidence requirements;
 * lifecycle semantics;
 * interoperability considerations;
-* implementation profile mappings.
+* implementation profile mappings;
+* validation against additional independent implementations.
 
 The goal is not to standardize one implementation, but to establish a common contract that multiple implementations can satisfy.
