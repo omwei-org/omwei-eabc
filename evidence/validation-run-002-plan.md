@@ -100,23 +100,30 @@ following actually occurred, because they are not equivalent:
   share the counter, with no actual change to the authority governing this
   specific command.
 
-**Feasibility condition**: Scenario 2 (below) is only a valid shared-counter
-test if the implementation under test permits triggering an epoch increment
-without altering the authority relevant to the command being tested. If the
-implementation has no mechanism to do this — i.e. every epoch increment is, by
-construction, tied to an authority-relevant change — Scenario 2 cannot be
-constructed as designed. In that case, this must be recorded explicitly as
-**"shared-counter case not constructible in this implementation"**, and
-Scenario 1's result must be reported as unable to rule out the shared-counter
-alternative, rather than silently treated as if the disambiguation had been
-performed.
+**Feasibility condition**: Scenario 2 is only a valid shared-counter test if the
+implementation under test permits triggering an epoch increment without
+altering the authority relevant to the command being tested.
+
+For the two implementations currently under test, this condition has been
+checked architecturally:
+
+- **Ron/authority side:** every epoch increment is tied to revocation or
+  reauthorization of the authority governing the act; there is no independent
+  unrelated epoch-increment path.
+- **EABC/GIE side:** the authority context is stored per `env_id`
+  (`dict[int, AuthorityContext]`), and `grant()`, `revoke()`,
+  `current_epoch()` and `check()` resolve the authority through that
+  environment-specific context. There is no shared global authority counter in
+  this implementation.
+
+Therefore Scenario 2 is **structurally excluded in both implementations**, not
+merely untested. It must be recorded as **"shared-counter case not
+constructible in this implementation"** rather than simulated by an unrelated
+epoch change.
 
 Only case (a) speaks to the TOCTOU/authority-re-establishment question this run
-is meant to test. Case (b) would only demonstrate a granularity artifact of the
-`epoch` field, not a genuine authority-change event. **The test protocol must
-construct both cases separately** and record which one actually occurred for
-each observed result, rather than treating any epoch increment as equivalent
-evidence.
+is meant to test. Case (b) would test a different architecture and cannot be
+claimed as evidence from these implementations.
 
 ### 3.2 Required disambiguation: fail-open vs. fail-closed
 
@@ -160,11 +167,11 @@ The final authority epoch must be attributable to the final authorization/commit
 | Scenario | Prepare | Intervening event | Commit | Purpose |
 |---|---|---|---|---|
 | 1 | Authority epoch N | Same authority revoked; epoch N→N+1 | Same prepared command | Primary TOCTOU case |
-| 2 | Authority epoch N | Unrelated global epoch increment; authority governing command unchanged | Same prepared command | Shared-counter control |
+| 2 | Authority epoch N | Unrelated global epoch increment; authority governing command unchanged | Same prepared command | Shared-counter control — **not runnable in current pair** |
 | 3 | Authority epoch N | Authority reaffirmed / no relevant change | Same prepared command | Baseline control |
 | 4 | Authority epoch N | Authority expires before commit | Same prepared command | Distinguish expiry from revocation |
 
-Scenario 2 is only valid if its feasibility condition in Section 3.1 is satisfied.
+Scenario 2 is **not runnable in the current implementation pair** because its feasibility condition is structurally excluded on both sides (Section 3.1).
 
 Scenario 4 must distinguish an actual expiry event from revocation or other authority invalidation.
 
