@@ -80,14 +80,14 @@ An interoperating implementation MAY use different local terminology, but the ma
 
 The first real interoperability run established `ALLOW` directly and established an implementation-side `BLOCK` result for a revoked command.
 
-The implementation owner has additionally identified the following finer-grained mapping for its seven local controller outcomes. This mapping is recorded here as an **implementation mapping to be preserved and independently validated through the corresponding evidence**, rather than as a change to the EABC core vocabulary:
+The implementation owner has additionally identified the following finer-grained mapping for its local controller outcomes. This mapping is recorded here as an **implementation mapping to be preserved and independently validated through the corresponding evidence**, rather than as a change to the EABC core vocabulary:
 
 | EABC semantic outcome | Implementation-side outcome | Mapping status |
 |---|---|---|
 | `ALLOW` | `ALLOW` | validated in Run 001 |
 | `DENY` | `BLOCK` | validated in Run 001 |
 | `DENY` | `MALFORMED_EXECUTION_OBJECT` | implementation mapping; pending independent evidence |
-| `DENY` | `EFFECTOR_FAILURE` | implementation mapping; pending independent evidence |
+| `FAILED` | `EFFECTOR_FAILURE` | implementation mapping; pending independent execution evidence |
 | `EXPIRED` | `STALE_EPOCH` | implementation mapping; pending independent evidence |
 | `CANCELLED` | `REVOKED` | implementation mapping; pending independent evidence |
 | `UNKNOWN` | `AUTHORITY_REFUSAL` | implementation mapping; pending independent evidence |
@@ -98,7 +98,7 @@ The important distinction is between **authority outcomes** and **controller-sid
 
 Likewise, `AUTHORITY_REFUSAL` is mapped to `UNKNOWN` because the authority decision could not be obtained. It MUST NOT be represented as `DENY`, because doing so would falsely imply that an authority decision was actually made.
 
-The mappings above are implementation mappings, not new EABC authorization outcomes. In particular, `STALE_EPOCH` does not become a sixth EABC outcome merely because the implementation uses that code.
+The mappings above are implementation mappings, not new EABC authorization or execution outcomes. In particular, `STALE_EPOCH` does not become a sixth EABC authorization outcome merely because the implementation uses that code. `EFFECTOR_FAILURE` is an execution failure: it applies when authorization was `ALLOW` but the effector did not successfully execute the authorized command. A post-commit evidence or attestation failure must likewise not be rewritten as authorization `DENY`; where the external effect may have committed but evidence is insufficient, the execution/evidence state remains subject to the `UNKNOWN` semantics in [003].
 
 ### 4.2 Mapping discipline
 
@@ -235,7 +235,7 @@ This section is intentionally extensible.
 |---|---|---|
 | EABC `DENY` | `BLOCK` | validated |
 | EABC `DENY` | `MALFORMED_EXECUTION_OBJECT` | pending evidence |
-| EABC `DENY` | `EFFECTOR_FAILURE` | pending evidence |
+| EABC `FAILED` (execution outcome, following authorization `ALLOW`) | `EFFECTOR_FAILURE` | pending execution evidence |
 | EABC `EXPIRED` | `STALE_EPOCH` | pending evidence |
 | EABC `CANCELLED` | `REVOKED` | pending evidence |
 | EABC `UNKNOWN` | `AUTHORITY_REFUSAL` | pending evidence |
