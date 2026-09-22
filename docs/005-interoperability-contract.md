@@ -1,6 +1,6 @@
 # EABC Interoperability Contract
 
-**Status:** Draft v0.1 — Provisional  
+**Status:** Draft v0.2 — Provisional  
 **Validation status:** Validated against one implementation pair and one real interoperability run  
 **Scope:** Interoperability between independent implementations of an EABC execution-authority boundary
 
@@ -203,6 +203,63 @@ The currently validated implementation pair uses journal fields including:
 These fields are an implementation-specific integrity mechanism. They are **not EABC interoperability requirements**.
 
 The important interoperability property is that an independent consumer can verify the relevant evidence and its correlation without trusting an opaque implementation-side mapping.
+
+---
+
+## 9. Record-shape interoperability
+
+The two independently maintained record shapes used by the current interoperability pair are intentionally kept distinct. The purpose of this table is to make the correlation mapping explicit and prevent an implementation-specific field name from being mistaken for the shared EABC semantic.
+
+| Interoperability meaning | Ron-side record | EABC/CommitEvidence record | Notes |
+|---|---|---|---|
+| Command identifier | `command_id` | `command_id` | Shared correlation key. The reconciler pairs records on `command_id`. |
+| Exact command digest | `payload_digest` | `action_digest` | Same semantic binding: digest of the exact governed command/action bytes. The names are implementation-specific. |
+| Journal sequence | `seq` | — | Ron-side journal sequence. Not an EABC semantic requirement. |
+| Previous integrity reference | — | `prev_hash` | EABC-side hash-chain predecessor. Ron's record shape does not expose this as the same field. |
+| Record integrity value | `entry_hash` | `record_hash` | Implementation-specific integrity value. The two values MUST NOT be assumed byte-for-byte equivalent without an explicit mapping/recipe. |
+| Environment / execution context | `env_id` | `env_id` | Shared environment/target-context identifier. |
+| Authority state | `epoch` (Ron-side reconciler interpretation) | `authority_epoch` | Interoperability meaning is **authority epoch**. Local field names MUST NOT be conflated. |
+| Execution-side epoch | — | `execution_epoch` | Distinct from authority epoch; present where the implementation has this concept. |
+| Stage | — | `stage` | EABC-side lifecycle/context field. |
+| Authorization decision | — | `authorization_decision` | EABC-side decision dimension. |
+| Authorization reason | — | `authorization_reason` | EABC-side reason dimension. |
+| Safety decision | — | `safety_decision` | EABC-side safety dimension where represented. |
+| Safety reason | — | `safety_reason` | EABC-side safety reason where represented. |
+| Commit decision | — | `commit_decision` | EABC-side commit decision dimension. |
+| Commit reason | — | `commit_reason` | EABC-side commit reason dimension. |
+| Execution outcome | — | `execution_outcome` | EABC-side execution result dimension. |
+| Applied | — | `applied` | Indicates whether the governed effect was applied in the EABC-side record. |
+| Timestamp | — | `timestamp` | EABC-side record timestamp. |
+
+### 9.1 Correlation rule
+
+For the current interoperability run, `command_id` is the primary cross-record correlation key. `payload_digest` and `action_digest` provide the corresponding content-binding evidence and MUST agree for records referring to the same governed command.
+
+A consumer MUST NOT infer field equivalence from similar names, numeric equality, or successful local tests. The mapping above is the published interoperability mapping for this implementation pair.
+
+In particular:
+
+- Ron-side `payload_digest` maps to EABC-side `action_digest`.
+- Ron-side `seq` is a journal sequencing field; it is not an EABC execution epoch or authority epoch.
+- EABC-side `prev_hash` participates in the EABC-side hash chain and is not a substitute for Ron-side `seq`.
+- Ron-side `entry_hash` and EABC-side `record_hash` are integrity values from different record representations. Their relationship is a matter of the respective integrity recipes, not a naming convention.
+- The authority-state meaning is **authority epoch**, regardless of whether a local implementation calls the field `epoch`, `authority_epoch`, `execution_epoch`, or `governance_epoch` at a particular point in the path.
+
+### 9.2 EABC-side persistence and hash recipe
+
+The current EABC-side `CommitEvidence` persistence is mandatory; the evidence record is written to JSONL rather than being conditionally persisted.
+
+The persisted JSON object uses `sort_keys=True` for its storage representation. This does **not** define the integrity-hash input order.
+
+The EABC-side integrity hash is computed using the fixed `_HASH_FIELD_ORDER`:
+
+`stage, command_id, env_id, action_digest, execution_epoch, authority_epoch, authorization_decision, authorization_reason, safety_decision, safety_reason, commit_decision, commit_reason, execution_outcome, applied, timestamp`
+
+The hash input is constructed by prepending `prev_hash` to the concatenated `json.dumps(field, separators=(",",":"))` values in that fixed order. SHA-256 is then computed over the resulting UTF-8 bytes. The genesis `prev_hash` is 64 zeroes.
+
+Therefore, an independent verifier MUST NOT recompute the EABC-side chain hash from the alphabetical key order of the persisted JSON object. The JSON serialization order and the integrity-hash field order are deliberately separate.
+
+The current EABC-side persistence implementation is identified by commit `fcdab39`. The implementation commit establishes the implementation state; this contract records the interoperability meaning and verification recipe.
 
 ---
 
