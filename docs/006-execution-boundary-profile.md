@@ -166,6 +166,16 @@ BIND ≠ FINAL_AUTHORITY_CHECK ≠ COMMIT
 
 Boundary Binding does not itself authorize an execution or constitute a COMMIT.
 
+### 4.1 Execution Context Invariance
+
+The ExecutionBoundaryContract established by Boundary Binding is the applicable execution context for execution-boundary evaluation of the protected effect.
+
+FINAL_AUTHORITY_CHECK MUST evaluate the execution authority against that applicable ExecutionBoundaryContract.
+
+An execution authority MUST NOT be committed under a different ExecutionBoundaryContract unless an explicitly authorized context transition applies.
+
+Accordingly, changing the contract context MUST NOT silently change the conditions under which an already-authorized execution authority may be committed.
+
 ---
 
 ## 5. Protected Effect
