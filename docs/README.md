@@ -35,6 +35,9 @@ Evidence Requirements
 Execution Semantics
         │
         ▼
+Execution-Boundary Profile
+        │
+        ▼
 Conformance Requirements
         │
         ▼
@@ -93,7 +96,7 @@ This document defines what a conforming system must guarantee.
 
 `002-evidence-model.md`
 
-Defines the evidence categories required to demonstrate compliance with EABC properties.
+Defines the eight transaction-scoped EABC Core evidence categories required to demonstrate compliance with EABC properties.
 
 This document describes:
 
@@ -107,6 +110,8 @@ This document describes:
 * integrity evidence.
 
 This document defines how compliance can be independently evaluated.
+
+EBP Conformance Evidence is defined separately in **006 – Execution-Boundary Profile** and is not added as a ninth Core category.
 
 ---
 
@@ -137,7 +142,7 @@ This prevents ambiguity between permission and actual execution.
 
 `004-conformance.md`
 
-Defines how implementations claim compatibility with EABC.
+Defines how implementations claim compatibility with EABC Core.
 
 This document specifies:
 
