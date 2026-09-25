@@ -57,6 +57,19 @@ The profile SHALL describe:
 
 ---
 
+
+## Relationship to the Execution-Boundary Profile
+
+EABC Core conformance and EBP execution-boundary conformance are related but distinct.
+
+Core conformance demonstrates satisfaction of the normative execution-authority properties defined in **001 – Execution Authority Properties**, together with the evidence and execution semantics defined by the Core specification.
+
+EBP additionally defines conformance of a concrete execution-boundary implementation against an **ExecutionBoundaryContract** and its Required Boundary Properties. EBP conformance uses instance-scoped Conformance Evidence and a time-indexed Conformance Status.
+
+An implementation MUST NOT claim that Core conformance alone establishes conformance to an EBP ExecutionBoundaryContract. Conversely, an EBP implementation mapping MUST NOT redefine the normative Core properties.
+
+The EBP conformance gate is a precondition to valid COMMIT, not a replacement for `FINAL_AUTHORITY_CHECK` and not an authorization decision.
+
 # Mandatory Requirements
 
 A conforming implementation MUST:
