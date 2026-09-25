@@ -144,6 +144,23 @@ Implementations SHOULD avoid collapsing these into a generic error.
 
 ---
 
+
+## EBP Boundary Failure Separation
+
+The EABC Execution-Boundary Profile (EBP) introduces execution-boundary and conformance gates in addition to the Core authorization and execution semantics defined in this document.
+
+EBP MUST preserve the semantic distinction between:
+
+| Outcome | Meaning | Evidence class |
+| --- | --- | --- |
+| `NO VALID COMMIT` | Required execution-boundary conformance is not eligible; the underlying authorization decision is not thereby denied. | EBP Conformance Evidence |
+| `DENY` | The authorization decision prohibits the execution authority from proceeding. | Decision Evidence |
+| `COMMIT REFUSED` | The commit act was reached, but its own commit conditions were not satisfied. | Commit Evidence |
+
+These labels MUST NOT be collapsed into a generic failure outcome. In particular, `DENY` remains an authorization outcome and MUST NOT be used to represent conformance ineligibility or failure of the commit act itself.
+
+The EBP semantics are defined in **006 – Execution-Boundary Profile** and do not add these outcomes to the EABC Core authorization-outcome vocabulary unless a future Core revision explicitly does so.
+
 # Missing Evidence
 
 Missing evidence SHALL NOT be interpreted as success.

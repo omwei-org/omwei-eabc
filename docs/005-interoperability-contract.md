@@ -66,7 +66,7 @@ In the current pair, the authority-side source is `authority_epoch`; it is carri
 
 ## 4. Authorization decision mapping
 
-EABC authorization outcomes are defined in [003]:
+EABC Core authorization outcomes are defined in [003]:
 
 - `ALLOW`
 - `DENY`
@@ -74,13 +74,15 @@ EABC authorization outcomes are defined in [003]:
 - `CANCELLED`
 - `UNKNOWN`
 
+These remain authorization outcomes only. EBP boundary/conformance outcomes are not authorization outcomes and MUST NOT be folded into this vocabulary merely for interoperability convenience.
+
 An interoperating implementation MAY use different local terminology, but the mapping to the EABC semantic outcome MUST be explicit.
 
 ### 4.1 Known implementation mapping
 
 The first real interoperability run established `ALLOW` directly and established an implementation-side `BLOCK` result for a revoked command.
 
-The implementation owner has additionally identified the following finer-grained mapping for its local controller outcomes. This mapping is recorded here as an **implementation mapping to be preserved and independently validated through the corresponding evidence**, rather than as a change to the EABC core vocabulary:
+The implementation owner has additionally identified the following finer-grained mapping for its local controller outcomes. This mapping is recorded here as an **implementation mapping to be preserved and independently validated through the corresponding evidence**, rather than as a change to the EABC Core vocabulary or to the EBP failure semantics:
 
 | EABC semantic outcome | Implementation-side outcome | Mapping status |
 |---|---|---|
@@ -99,6 +101,8 @@ The important distinction is between **authority outcomes** and **controller-sid
 Likewise, `AUTHORITY_REFUSAL` is mapped to `UNKNOWN` because the authority decision could not be obtained. It MUST NOT be represented as `DENY`, because doing so would falsely imply that an authority decision was actually made.
 
 The mappings above are implementation mappings, not new EABC authorization or execution outcomes. In particular, `STALE_EPOCH` does not become a sixth EABC authorization outcome merely because the implementation uses that code. `EFFECTOR_FAILURE` is an execution failure: it applies when authorization was `ALLOW` but the effector did not successfully execute the authorized command. A post-commit evidence or attestation failure must likewise not be rewritten as authorization `DENY`; where the external effect may have committed but evidence is insufficient, the execution/evidence state remains subject to the `UNKNOWN` semantics in [003].
+
+For EBP deployments, the distinction is additionally normative: failure of the conformance gate produces **NO VALID COMMIT**, failure of `FINAL_AUTHORITY_CHECK` produces **DENY**, and failure of `COMMIT_CONDITIONS` after the commit act is reached produces **COMMIT REFUSED**. Only the middle case is an authorization outcome. The interoperability record MUST preserve which gate produced the outcome rather than collapsing all three into `DENY`, `BLOCK`, or a generic failure.
 
 ### 4.2 Mapping discipline
 
@@ -269,7 +273,23 @@ The current EABC-side persistence implementation is identified by commit `fcdab3
 
 ## 10. Commit-time semantics
 
-Interoperability MUST preserve the distinction between authorization evaluation and externally effective commit.
+Interoperability MUST preserve the distinction between authorization evaluation, execution-boundary conformance, and externally effective commit.
+
+For an EBP-protected effect, the normative sequence is:
+
+1. the applicable ExecutionBoundaryContract is bound to the execution-boundary implementation instance;
+2. the implementation has a `VALID` conformance status and is therefore conformance-eligible;
+3. `FINAL_AUTHORITY_CHECK` is evaluated immediately before COMMIT;
+4. `COMMIT_CONDITIONS` are evaluated as required by the applicable contract;
+5. successful COMMIT may produce the protected EFFECT.
+
+The corresponding failure meanings MUST remain distinct:
+
+- no conformance eligibility → **NO VALID COMMIT**;
+- failed `FINAL_AUTHORITY_CHECK` → **DENY**;
+- failed `COMMIT_CONDITIONS` after the commit act is reached → **COMMIT REFUSED**.
+
+These EBP outcomes MUST NOT be represented as interchangeable authorization outcomes. In particular, conformance ineligibility MUST NOT be rewritten as `DENY`, and commit refusal MUST NOT be rewritten as `DENY`.
 
 The authority state used for the final authorization decision MUST be identifiable in the evidence.
 

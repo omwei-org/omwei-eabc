@@ -4,7 +4,7 @@
 
 The **Execution Authority Boundary Contract (EABC)** defines an implementation-independent contract between systems that authorize actions and systems that execute them.
 
-EABC specifies the minimum architectural properties, evidence requirements, and execution semantics required to establish trustworthy execution-authority boundaries.
+EABC specifies the minimum architectural properties, evidence requirements, execution semantics, and execution-boundary semantics required to establish trustworthy execution-authority boundaries.
 
 The goal is to enable interoperability between autonomous system architectures without requiring a shared implementation.
 
@@ -41,6 +41,7 @@ EABC defines:
 * execution lifecycle semantics;
 * failure semantics;
 * conformance requirements;
+* execution-boundary contract semantics through the Execution-Boundary Profile (EBP);
 * implementation profile structure.
 
 EABC defines the boundary contract, not a specific implementation.
@@ -160,6 +161,7 @@ Core documents:
 | Evidence Model                  | Verification requirements         |
 | Failure and Execution Semantics | Lifecycle semantics               |
 | Conformance                     | Compatibility requirements        |
+| Execution-Boundary Profile       | Execution-boundary and conformance semantics |
 
 ---
 
