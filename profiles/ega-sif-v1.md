@@ -28,6 +28,43 @@ The architecture establishes a boundary between:
 
 This profile describes how EGA/SIF satisfies the EABC requirements without defining EABC itself.
 
+## Role of EGA
+
+**Execution Governance Authority (EGA)** is the authorization-to-execution-authority bridge within the reference architecture. It is a distinct architectural role, not necessarily a standalone product or process.
+
+EGA is designed to consume the runtime output of an upstream **Runtime AI Governance (RAIG)** system or equivalent governance component. Such upstream systems may provide decision context, identity, intent, policy signals, risk signals, evidence, or other governance inputs. EGA does not replace that governance function; it normalizes the relevant runtime intent and evaluates it against the applicable provisioning-time authorization scope.
+
+Conceptually:
+
+```text
+Runtime AI Governance
+        │
+        │ runtime intent + governance context
+        ▼
+       EGA
+        │
+        │ explicit execution authority
+        │ AO → AEE → ECT
+        ▼
+   EABC / Enforcement Boundary
+        │
+        ▼
+      EFFECT
+```
+
+EGA is responsible for making execution authority explicit and context-bound. In the EGA/SIF reference model, this includes:
+
+* accepting and normalizing a concrete runtime intent;
+* evaluating that intent against the applicable Authorization Object (AO) and runtime context;
+* deriving the Authorized Execution Envelope (AEE);
+* producing the Execution Control Token (ECT) and preserving the authorization lineage needed at the execution boundary.
+
+EGA is **not** the execution system and does not itself commit the externally observable effect. It does not model the State Transition Function, independently determine whether a physical or logical state transition is safe, or choose the implementation substrate of the enforcement boundary. Those responsibilities belong downstream of EGA and are addressed by the EABC/SIF and execution-boundary architecture.
+
+The resulting separation is therefore:
+
+> **Runtime AI Governance provides governance input; EGA establishes explicit execution authority; the EABC/SIF boundary independently determines whether that authority may become a committed effect under current execution conditions.**
+
 ## Terminology Note
 
 The theoretical foundation of this profile — the *Execution Authority* research whitepaper — defines a single portable authority artifact, the **Authorization Artifact (ACT)**, presented by a Decision Authority to an Execution Authority.
