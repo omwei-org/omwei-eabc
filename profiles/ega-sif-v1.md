@@ -4,7 +4,10 @@
 
 ## Status
 
-This document defines the EABC Implementation Profile for the Equinibria Governance Architecture / Secure Intent Fabric (EGA/SIF) reference architecture.
+This document defines the EABC Implementation Profile for the **EGA/SIF reference architecture**.
+
+**EGA — Execution Governance Authority**  
+**SIF — Semantic Integrity Framework**
 
 This profile describes how EGA/SIF maps its architectural components and evidence model to the requirements defined by the Execution Authority Boundary Contract (EABC).
 
