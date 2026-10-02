@@ -22,6 +22,56 @@ The full Core ↔ EBP crosswalk (13 elements) is normative and given in §7.
 
 **REQUIRED BOUNDARY PROPERTIES** — a static, instance-scoped set of properties that a candidate implementation must satisfy before it is eligible to serve any commit under this contract. Unlike Authority/Boundary/Commit Conditions, which are evaluated per-commit, Required Boundary Properties are evaluated once per implementation instance via conformance assessment (§3), not on every transaction.
 
+### 2.1 Protected Effect Scope and Path Scope
+
+The Required Boundary Properties are assessed relative to an explicitly declared **Protected Effect Scope**. The scope identifies the externally observable consequence for which the execution boundary is being claimed as authoritative.
+
+A Protected Effect Scope MUST be sufficiently specific to determine which execution paths are relevant to the conformance claim. The scope MAY cover one protected effect, a defined class of effects, or a bounded set of resources and transitions. A claim MUST NOT be interpreted as global beyond the scope declared by the applicable contract and threat model.
+
+For the purposes of Complete Mediation and the EBP properties of Exclusivity and Non-bypass, the assessment scope is further represented as a **Path Scope**:
+
+- **Protected Effect Scope** — what externally observable consequence is protected.
+- **Path Scope** — the set of in-scope execution paths that are capable of producing that protected effect under the declared threat model.
+- **Boundary Scope** — the execution-authority boundary that is claimed to mediate those paths.
+
+The relationship is:
+
+```text
+Protected Effect Scope
+        │
+        ▼
+   Path Scope
+        │
+        ▼
+Complete Mediation (Core P2)
+        │
+        ▼
+Exclusivity / Non-bypass (EBP)
+```
+
+**Complete Mediation** is the Core property that every in-scope path capable of producing the protected effect is subject to the applicable authority boundary. EBP's **Exclusivity** and **Non-bypass** properties establish the corresponding boundary-level deployment claim: there is no in-scope alternative path through which the protected effect can occur outside that boundary.
+
+Exclusivity and Non-bypass are therefore not additional replacements for Core Property 2. They are boundary-conformance properties used to substantiate the stronger claim that the deployment topology actually supports complete mediation for the declared scope.
+
+### 2.2 Threat Model and Scope of a Non-bypass Claim
+
+A non-bypass claim MUST state the threat model and scope under which it is assessed.
+
+At minimum, the conformance record MUST identify:
+
+- the Protected Effect Scope;
+- the Path Scope or the method by which all in-scope paths are enumerated or bounded;
+- the execution-boundary instance and its binding to the contract;
+- the applicable Required Boundary Properties;
+- the threat model defining which alternative paths, actors, compromise assumptions, and environmental conditions are in scope; and
+- the evidence and assessment method used to substantiate the claim.
+
+The phrase **non-bypassable** MUST NOT be interpreted as an unconditional claim that no conceivable path exists. It means that, under the declared Protected Effect Scope, Path Scope, deployment configuration, and threat model, the required boundary properties have been assessed as satisfied and no in-scope path capable of producing the protected effect bypasses the boundary.
+
+If a relevant path is outside the declared threat model or cannot be bounded by the assessment method, that limitation MUST be explicit in the conformance evidence. It MUST NOT be silently treated as evidence that the path is absent.
+
+This scope discipline also prevents a fresh implementation attestation or an implementation identity claim from being used as a substitute for path/exclusivity evidence. As stated in §4.1, **Fresh Attestation ≠ Non-bypass** and **Implementation Identity ≠ Execution Boundary Exclusivity**.
+
 The initial property set:
 
 - **Independence** — the boundary's admit/refuse decision is not controllable by the party whose action is being evaluated.
