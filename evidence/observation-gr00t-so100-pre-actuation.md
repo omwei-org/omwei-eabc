@@ -256,3 +256,48 @@ This is a **runtime test of pinned LeRobot motor-bus conversion/serialization**,
 - These 14 cases do not establish complete path-set coverage for GR00T, LeRobot, or a deployed robot system.
 
 Evidence levels remain distinct: (1) adapter-only reproduction; (2) runtime test of the pinned LeRobot motor-bus driver conversion/serialization; (3) payload captured at a mocked SDK boundary; (4) actual physical actuation — **not tested**.
+
+
+## 11. Follow-up runtime test — actual pinned SO100Follower.send_action()
+
+**Run:** [Pinned LeRobot SO100 driver reproduction — run 38776033231](https://github.com/omwei-org/omwei-eabc/actions/runs/38776033231)  
+**Status:** PASS; full job logs inspected  
+**Harness commit:** `ae919423cfd7abdcf64ef5e47ce44fa16f6beddc`  
+**LeRobot revision:** `c75455a6de5c818fa1bb69fb2d92423e86c70475`  
+**Python:** CPython 3.11.17  
+**Command:** `python evidence/scripts/test_pinned_lerobot_driver.py`
+
+The harness now imports and calls the actual pinned `SO100Follower.send_action()` method. Construction-time dependencies (base robot initialization, camera factory/config imports, and an unrelated robot factory import) are stubbed so no camera, calibration setup, physical serial device, or motor is initialized. The follower method, pinned `ensure_safe_goal_position()`, `FeetechMotorsBus.sync_write()`, normalization, sign encoding, serialization, and recording `GroupSyncWrite.addParam()` remain the actual pinned implementations. The mock SDK captures payload bytes and does not transmit a packet.
+
+### `send_action()` results
+
+The cases below use a single mocked joint with calibration range 0–4095. For `max_relative_target=None`, present-position reading is not called by the pinned method.
+
+| Case | Configuration / input | `send_action()` outcome | Exact mock SDK bytes |
+|---|---|---|---|
+| finite | `RANGE_M100_100`, `0.0`, cap `None` | returns `{'joint.pos': 0.0}` | `[255, 7]` |
+| NaN | `RANGE_M100_100`, NaN, cap `None` | returns NaN unchanged in returned action; bus conversion maps to lower endpoint | `[0, 0]` |
+| +Inf | `RANGE_M100_100`, +Inf, cap `None` | returns +Inf unchanged in returned action; bus conversion maps to upper endpoint | `[255, 15]` |
+| −Inf | `RANGE_M100_100`, −Inf, cap `None` | returns −Inf unchanged in returned action; bus conversion maps to lower endpoint | `[0, 0]` |
+| `1e100` | `RANGE_M100_100`, cap `None` | returns input unchanged; bus conversion maps to upper endpoint | `[255, 15]` |
+| `-1e100` | `RANGE_M100_100`, cap `None` | returns input unchanged; bus conversion maps to lower endpoint | `[0, 0]` |
+| NaN degrees | `DEGREES`, cap `None` | `ValueError: cannot convert float NaN to integer` | none |
+| +Inf degrees | `DEGREES`, cap `None` | `OverflowError: cannot convert float infinity to integer` | none |
+| −Inf degrees | `DEGREES`, cap `None` | `OverflowError: cannot convert float infinity to integer` | none |
+| `1e100` degrees | `DEGREES`, cap `None` | `ValueError` from sign-encoding magnitude limit | none |
+| `-1e100` degrees | `DEGREES`, cap `None` | `ValueError` from sign-encoding magnitude limit | none |
+| relative clip | `RANGE_M100_100`, input `100.0`, present position `0.0`, cap `2.0` | actual helper clips goal to `2.0`; returned action is `{'joint.pos': 2.0}` | `[40, 8]` |
+
+The relative-clipping payload `[40, 8]` is little-endian register value 2088, corresponding to the calibrated conversion of the clipped normalized target 2.0. The warning in the log records original target 100.0 and safe target 2.0.
+
+### Interpretation and remaining limits
+
+This follow-up now establishes runtime behaviour through the actual pinned `SO100Follower.send_action()` method for the cases above, including the `max_relative_target=None` branch and a configured scalar relative-target cap. The previous section's statement that the full follower method was not tested describes the earlier run (38775382201); this new run supersedes that limitation for the listed cases.
+
+Still not tested:
+- `max_relative_target` as a per-motor dictionary, including key mismatch and edge configurations;
+- a non-zero present-position value or multiple joints in the clipping branch;
+- the actual GR00T-to-`send_action()` call chain in one integrated process;
+- serial transport, motor acknowledgement, or physical actuation.
+
+**Boundary remains explicit:** this is a runtime test of pinned driver/follower code plus payload capture at a mocked SDK boundary. It does not prove that any serial packet reached a real motor or that physical movement occurred, and it does not establish complete path-set coverage.
