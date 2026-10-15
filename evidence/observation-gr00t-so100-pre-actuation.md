@@ -8,7 +8,7 @@
 >
 > The inspected GR00T SO100 adapter does not explicitly reject non-finite action values (NaN or ±Inf) or unusually large finite values before constructing the action dictionary. An isolated test harness also observed these values passing through the adapter-side selection path. This does **not**, by itself, prove that the real LeRobot motor bus receives those values or that a physical actuator moves.
 
-The evidence supports a validation gap at the adapter boundary. The end-to-end effect at the real driver/motor-bus boundary remains **unverified**.
+The evidence supports a validation gap at the adapter boundary and, by source tracing, a default normalized driver path that maps non-finite/extreme inputs to endpoint targets rather than rejecting them. The runtime SDK/transport effect remains **unverified**.
 
 ## 1. Provenance and evidence boundaries
 
@@ -143,7 +143,7 @@ This record does **not** establish:
 
 - that invalid values reach the real motor-bus write in the pinned LeRobot implementation;
 - that physical motor movement occurred with invalid values;
-- exact downstream handling of NaN, ±Inf or large finite values;
+- runtime confirmation that the source-traced default conversion results are the values actually submitted to the SDK/transport;
 - behaviour under non-default driver configurations;
 - behaviour of other GR00T embodiments or evaluation paths;
 - that adding an `isfinite` check alone would constitute a complete EABC execution-authority boundary;
@@ -190,7 +190,7 @@ Until that downstream test is complete, the conclusion must remain limited to th
 
 ## 10. Classification and next step
 
-**Classification: D — adapter-side validation gap observed; end-to-end driver effect unverified.**
+**Classification: D — adapter-side validation gap reproduced; pinned default driver source maps non-finite/extreme inputs to endpoint targets; runtime transport effect unverified.**
 
 This is a preliminary external-system observation, not validation of an EABC implementation and not evidence of physical actuation with invalid values.
 
