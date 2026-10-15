@@ -302,26 +302,3 @@ Still not tested:
 
 **Boundary remains explicit:** this is a runtime test of pinned driver/follower code plus payload capture at a mocked SDK boundary. It does not prove that any serial packet reached a real motor or that physical movement occurred, and it does not establish complete path-set coverage.
 
-## 12. Integrated GR00T → LeRobot runtime reproduction (2026-10-15)
-
-**Result:** PASS — [GitHub Actions run 38780361551](https://github.com/omwei-org/omwei-eabc/actions/runs/38780361551)
-**Harness commit:** `835e1055fd93c989e62e6d1dc7a095a4f870f3fc`
-**Workflow commit:** `38caa2f0df938fbfdbb5ce1343a428c20b88e20c`
-**GR00T SHA verified in CI:** `d2b7e75b937e3ec9aa5dbc798f08b89692c49734`
-**LeRobot SHA verified in CI:** `c75455a6de5c818fa1bb69fb2d92423e86c70475`
-**Python:** CPython 3.11.17
-
-The workflow checked out both exact upstream revisions, verified each checkout SHA, and successfully ran the integration harness. The harness imports the actual `So100Adapter` from GR00T's `gr00t/eval/real_robot/SO100/eval_so100.py`; a deterministic fake policy supplies action chunks. It then calls the real `So100Adapter.get_action()`, `_select_action_steps()`, and pinned LeRobot `SO100Follower.send_action()`, followed by real pinned Feetech unnormalization/sign encoding/serialization. Only optional imports and the SDK transport are replaced with test doubles. `GroupSyncWrite.addParam()` records the bytes; no serial packet is transmitted.
-
-| Policy output on `shoulder_pan.pos` | Action emitted by GR00T adapter | Captured serialized bytes | Raw value |
-|---|---|---|---:|
-| `0.0` | `0.0` | `[255, 7]` | 2047 |
-| `NaN` | `NaN` | `[0, 0]` | 0 |
-| `+Inf` | `+Inf` | `[255, 15]` | 4095 |
-| `-Inf` | `-Inf` | `[0, 0]` | 0 |
-| `1e100` | `1e100` | `[255, 15]` | 4095 |
-| `-1e100` | `-1e100` | `[0, 0]` | 0 |
-
-All six integrated assertions passed. In this tested route, GR00T's adapter and action-step selector preserve the invalid numeric values, and the pinned default normalized LeRobot path serializes them as endpoint positions rather than rejecting them. The test therefore confirms a software path from fake policy output through the actual adapter and follower method to the SDK-boundary payload recorder.
-
-**Limits:** This is not a full GR00T policy-server/inference run and does not establish every possible SO100/SO101 path or path-set completeness. It confirms bytes submitted to a mocked SDK boundary, not real serial transmission, motor acknowledgement, or physical actuation. The run is evidence for the exact pinned revisions and tested default normalized configuration only.
