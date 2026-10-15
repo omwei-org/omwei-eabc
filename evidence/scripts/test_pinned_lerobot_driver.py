@@ -153,6 +153,12 @@ sys.modules["lerobot.robots.robot"] = robots_base
 follower_config_mod = types.ModuleType("lerobot.robots.so100_follower.config_so100_follower")
 follower_config_mod.SO100FollowerConfig = type("SO100FollowerConfig", (), {})
 sys.modules["lerobot.robots.so100_follower.config_so100_follower"] = follower_config_mod
+# robots package initialization imports a factory helper that is not involved in
+# send_action(); stub only that factory dependency so pinned robot utilities load.
+import_utils = types.ModuleType("lerobot.utils.import_utils")
+import_utils.make_device_from_device_class = lambda *args, **kwargs: None
+sys.modules["lerobot.utils.import_utils"] = import_utils
+
 from lerobot.robots.so100_follower.so100_follower import SO100Follower
 
 def make_follower(mode, max_relative_target=None):
