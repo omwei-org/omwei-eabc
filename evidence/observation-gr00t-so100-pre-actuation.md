@@ -130,7 +130,7 @@ The following remain open:
 
 - a test exercising the actual pinned conversion path with NaN, ±Inf and extreme finite values;
 - a recording-transport assertion proving the exact serialized payload and whether the SDK accepts it;
-- behaviour with `use_degrees=True` or non-default `max_relative_target` settings;
+- runtime confirmation of the source-traced `use_degrees=True` exception path and of non-default `max_relative_target` settings;
 - any claim about physical motor movement.
 
 No physical movement was performed or is claimed in this record.
@@ -156,7 +156,7 @@ This record does **not** establish:
 - that invalid values reach the real motor-bus write in the pinned LeRobot implementation;
 - that physical motor movement occurred with invalid values;
 - runtime confirmation that the source-traced default conversion results are the values actually submitted to the SDK/transport;
-- behaviour under non-default driver configurations;
+- runtime behaviour under non-default driver configurations (the `use_degrees=True` branch has been source-traced, but not exercised through the runtime driver/transport);
 - behaviour of other GR00T embodiments or evaluation paths;
 - that adding an `isfinite` check alone would constitute a complete EABC execution-authority boundary;
 - interoperability with any EGA or EABC implementation;
@@ -192,10 +192,10 @@ A separate experiment could evaluate a gate before `send_action()`, with explici
 
 ### Downstream verification still required
 
-1. Inspect the exact LeRobot revision pinned by the GR00T project metadata.
-2. Trace the real follower implementation through unit conversion and the motor-bus write method.
-3. Add a test using the real conversion/driver code with a recording or fake transport at the lowest practical boundary; do not use a physical robot for initial fault injection.
-4. Assert and record exactly what reaches the transport for each invalid input, including any exceptions, clamping, conversion or rejection.
+1. Use the already identified pinned LeRobot revision `c75455a6de5c818fa1bb69fb2d92423e86c70475` and preserve that exact source anchor.
+2. Add a runtime test using the real `SO100Follower` and `FeetechMotorsBus` conversion code with a recording/mock SDK transport; do not use a physical robot for initial fault injection.
+3. Exercise the default `use_degrees=False` path with NaN, ±Inf, and extreme finite inputs, then separately exercise `use_degrees=True` and a configured `max_relative_target`.
+4. Assert and record whether each case raises, is clamped, or reaches the SDK/transport, including the exact serialized `Goal_Position` bytes where a write is attempted.
 5. Keep the result explicitly scoped to the tested revision and configuration.
 
 Until that downstream test is complete, the conclusion must remain limited to the adapter-side validation gap.
