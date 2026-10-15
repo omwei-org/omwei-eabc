@@ -1,6 +1,6 @@
 # Evidence Reference — GR00T SO100/SO101 Pre-Actuation Path
 
-**Status:** Preliminary external-system observation; downstream driver behaviour remains unverified  
+**Status:** Adapter-side gap reproduced; downstream driver path source-traced; transport-level reproduction remains open  
 **Analysis date:** 2026-10-15  
 **Scope:** Action validation in the NVIDIA Isaac-GR00T SO100 evaluation path, from policy output to the call site that invokes LeRobot's `send_action()`.
 
@@ -17,7 +17,8 @@ The evidence supports a validation gap at the adapter boundary. The end-to-end e
 | GR00T SO100 evaluation path | [NVIDIA/Isaac-GR00T](https://github.com/NVIDIA/Isaac-GR00T), `gr00t/eval/real_robot/SO100/eval_so100.py` | Source inspection of the adapter and action-selection path |
 | LeRobot dependency | [huggingface/lerobot](https://github.com/huggingface/lerobot), revision `c75455a6de5c818fa1bb69fb2d92423e86c70475` (as pinned by the GR00T SO100 project metadata) | Dependency/revision anchor; does not substitute for a reproduced end-to-end driver test |
 | Isolated adapter harness | Fake policy and test doubles; no physical robot | NaN, ±Inf and a large finite value were observed passing through the tested adapter-side path; structural errors raised exceptions |
-| Real motor bus / physical actuation | Not reproduced in this evidence run | Unverified |
+| Pinned LeRobot source trace | `SO100Follower.send_action()` → `MotorsBus.sync_write()` → `_unnormalize()` → Feetech serialization / `GroupSyncWrite` | Default normalized path appears to transform non-finite and extreme values into bounded endpoint commands; runtime transport test still required |
+| Real motor bus / physical actuation | No recording-transport test or physical robot used | Runtime transport result and physical actuation unverified |
 
 This record distinguishes source inspection, isolated reproduction, and real-driver behaviour. They are separate evidence levels and must not be conflated.
 
@@ -31,7 +32,7 @@ robot.send_action(action_dict)
   → bus.sync_write("Goal_Position", ...)
 ```
 
-The adapter-side tests did not establish that the final `sync_write` call in the real driver was reached with the invalid values. The path above identifies the effect being investigated, not a claim that the entire path has been reproduced.
+The adapter-side tests did not establish runtime behaviour at the driver boundary. A subsequent source trace found that the default normalized SO100 path appears to convert non-finite and extreme inputs to endpoint targets before Feetech serialization; a recording-transport test is still required to verify the runtime payload.
 
 ## 3. Source-traced adapter path
 
@@ -82,18 +83,43 @@ Functions exercised in the isolated adapter-side tests:
 
 in `gr00t/eval/real_robot/SO100/eval_so100.py`.
 
-## 5. Downstream driver behaviour: open verification item
+## 5. Downstream driver: source-level trace; runtime transport test still open
 
-The GR00T project metadata pins a LeRobot revision, but this evidence record does not contain a reproducible end-to-end test proving the handling of NaN, ±Inf, or extreme finite values by the real driver and motor bus.
+The pinned LeRobot source has now been traced through the SO100 follower and Feetech motor-bus conversion. This is a **source-level finding**, not yet a reproduced runtime test using a recording transport.
 
-In particular, the following must remain open until verified against the pinned source and a test that reaches the relevant code:
+Relevant pinned source anchors:
 
-- whether and where action values are unnormalised or clipped;
-- how NaN and infinities behave under the exact numeric operations used by the pinned implementation;
-- whether conversion to motor units or bus payload types rejects, clamps, transforms, or propagates such values;
-- whether the real `sync_write("Goal_Position", ...)` call can be reached with the tested inputs.
+- [SO100 follower implementation](https://github.com/huggingface/lerobot/blob/c75455a6de5c818fa1bb69fb2d92423e86c70475/src/lerobot/robots/so100_follower/so100_follower.py)
+- [SO100 follower configuration](https://github.com/huggingface/lerobot/blob/c75455a6de5c818fa1bb69fb2d92423e86c70475/src/lerobot/robots/so100_follower/config_so100_follower.py)
+- [Motor-bus conversion and sync-write path](https://github.com/huggingface/lerobot/blob/c75455a6de5c818fa1bb69fb2d92423e86c70475/src/lerobot/motors/motors_bus.py)
+- [Feetech sign encoding and packet setup](https://github.com/huggingface/lerobot/blob/c75455a6de5c818fa1bb69fb2d92423e86c70475/src/lerobot/motors/feetech/feetech.py)
 
-Do not infer these outcomes from a fake `sync_write`, from generic Python numeric behaviour, or from the presence/absence of `max_relative_target` alone.
+### Default configuration path
+
+The SO100 follower selects `MotorNormMode.RANGE_M100_100` for the five body joints when `use_degrees=False` (the default), and `MotorNormMode.RANGE_0_100` for the gripper. The configuration defaults `max_relative_target` to `None`, so the relative-target clipping branch in `send_action()` is skipped unless a deployment overrides it.
+
+For those default normalized modes, `MotorsBus._unnormalize()` clamps values using `min(maximum, max(minimum, value))` and converts the result to an integer motor position. Applying the exact Python operations used by that source gives:
+
+| Input | Body joint normalized value | Gripper normalized value |
+|---|---:|---:|
+| `NaN` | `-100` (lower endpoint) | `0` (lower endpoint) |
+| `+Inf` | `100` (upper endpoint) | `100` (upper endpoint) |
+| `-Inf` | `-100` (lower endpoint) | `0` (lower endpoint) |
+| Very large positive finite value | `100` (upper endpoint) | `100` (upper endpoint) |
+| Very large negative finite value | `-100` (lower endpoint) | `0` (lower endpoint) |
+
+These are normalized endpoints, which are then mapped using the motor calibration ranges. Thus, in the default normalized path, the source does not show these inputs being rejected by a finite-number check; it shows them being converted to endpoint targets. The endpoint targets are numeric and can proceed through sign encoding and serialization if the bus is connected, calibration is present, and the remaining driver/SDK operations succeed.
+
+### What remains unverified
+
+The source path proceeds from `send_action()` to `sync_write("Goal_Position", ...)`, then through unnormalization, sign encoding, byte serialization and the Feetech sync-writer setup / packet-send call. However, this evidence record still does **not** contain a runtime test with the pinned implementation and a recording transport proving the exact values submitted to the SDK or transport.
+
+The following remain open:
+
+- a test exercising the actual pinned conversion path with NaN, ±Inf and extreme finite values;
+- a recording-transport assertion proving the exact serialized payload and whether the SDK accepts it;
+- behaviour with `use_degrees=True` or non-default `max_relative_target` settings;
+- any claim about physical motor movement.
 
 No physical movement was performed or is claimed in this record.
 
@@ -168,4 +194,4 @@ Until that downstream test is complete, the conclusion must remain limited to th
 
 This is a preliminary external-system observation, not validation of an EABC implementation and not evidence of physical actuation with invalid values.
 
-The next evidence-producing step is to verify the pinned LeRobot conversion and motor-bus path with a reproducible test. Do not upgrade the classification to a confirmed motor-write-path finding until that evidence exists.
+The next evidence-producing step is a recording-transport test against the pinned LeRobot conversion and motor-bus code. The source trace strengthens the concern from an adapter-only observation to a plausible downstream path, but do not classify the runtime motor-write path as confirmed until that test exists.
