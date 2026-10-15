@@ -1,234 +1,171 @@
-# Evidence Reference — Observation: GR00T SO100 Pre-Actuation Path
+# Evidence Reference — GR00T SO100/SO101 Pre-Actuation Path
 
-**Status:** External system observation (negative path)  
-**Date of observed analysis:** 2026-10-15  
-**Scope:** Pre-actuation action path from NVIDIA Isaac-GR00T policy output to LeRobot SO100/SO101 motor write
+**Status:** Preliminary external-system observation; downstream driver behaviour remains unverified  
+**Analysis date:** 2026-10-15  
+**Scope:** Action validation in the NVIDIA Isaac-GR00T SO100 evaluation path, from policy output to the call site that invokes LeRobot's `send_action()`.
 
-> **Key observation**
+> **Key finding**
 >
-> **Invalid model outputs (NaN, ±Inf, unusually large finite values) pass through the GR00T SO100 evaluation adapter and reach the LeRobot `send_action()` / motor-write boundary without rejection.**
->
-> There is no execution-authority boundary, Commit Gate, or fail-closed check on this protected-effect path in the reference configuration.
+> The inspected GR00T SO100 adapter does not explicitly reject non-finite action values (NaN or ±Inf) or unusually large finite values before constructing the action dictionary. An isolated test harness also observed these values passing through the adapter-side selection path. This does **not**, by itself, prove that the real LeRobot motor bus receives those values or that a physical actuator moves.
 
-## 1. Provenance and chain-of-custody anchors
+The evidence supports a validation gap at the adapter boundary. The end-to-end effect at the real driver/motor-bus boundary remains **unverified**.
 
-### Source systems
+## 1. Provenance and evidence boundaries
 
-| Component | Source | Anchor |
+| Component | Source / anchor | What is established |
 |---|---|---|
-| GR00T eval path | [NVIDIA/Isaac-GR00T](https://github.com/NVIDIA/Isaac-GR00T) | Local checkout analysed 2026-10-15; key file `gr00t/eval/real_robot/SO100/eval_so100.py` |
-| LeRobot driver | [huggingface/lerobot](https://github.com/huggingface/lerobot) @ `c75455a6de5c818fa1bb69fb2d92423e86c70475` | Pinned by GR00T SO100 `pyproject.toml` |
-| Automated tests | Isolated unit tests against `So100Adapter` + `_select_action_steps` | Fake policy, no hardware |
+| GR00T SO100 evaluation path | [NVIDIA/Isaac-GR00T](https://github.com/NVIDIA/Isaac-GR00T), `gr00t/eval/real_robot/SO100/eval_so100.py` | Source inspection of the adapter and action-selection path |
+| LeRobot dependency | [huggingface/lerobot](https://github.com/huggingface/lerobot), revision `c75455a6de5c818fa1bb69fb2d92423e86c70475` (as pinned by the GR00T SO100 project metadata) | Dependency/revision anchor; does not substitute for a reproduced end-to-end driver test |
+| Isolated adapter harness | Fake policy and test doubles; no physical robot | NaN, ±Inf and a large finite value were observed passing through the tested adapter-side path; structural errors raised exceptions |
+| Real motor bus / physical actuation | Not reproduced in this evidence run | Unverified |
 
-### EABC contract anchor
+This record distinguishes source inspection, isolated reproduction, and real-driver behaviour. They are separate evidence levels and must not be conflated.
 
-This record is subordinate to:
+## 2. Protected effect and current scope
 
-- `docs/001` — Execution Authority Properties (Complete Mediation, Independent Execution Authority)
-- `docs/002` — Evidence Model
-- `docs/003` — Failure and Execution Semantics (fail-closed)
-- `docs/004` — Conformance
-
-It does **not** redefine EABC requirements. It records an observed gap in an external real-robot VLA evaluation path.
-
-## 2. Protected effect under observation
-
-The externally committed effect of interest is:
+The effect of interest is a joint-position command ultimately written to a SO100/SO101 motor bus, commonly through a call such as:
 
 ```text
-LeRobot SO100/SO101 follower
-  → bus.sync_write("Goal_Position", goal_pos)
-I.e. a joint-position command written to the motor bus.
-3. Observed call path (source-traced)
-textPolicyClient / Gr00tPolicy.get_action()
-        │  action chunk (may contain NaN / ±Inf / large finite)
+robot.send_action(action_dict)
+  → LeRobot follower / motor-bus path
+  → bus.sync_write("Goal_Position", ...)
+```
+
+The adapter-side tests did not establish that the final `sync_write` call in the real driver was reached with the invalid values. The path above identifies the effect being investigated, not a claim that the entire path has been reproduced.
+
+## 3. Source-traced adapter path
+
+The inspected GR00T evaluation flow includes the following stages:
+
+```text
+policy / Gr00tPolicy.get_action()
+        │ action chunk
         ▼
 So100Adapter.get_action()
+        ▼
+So100Adapter.decode_action_chunk()
+        ▼
+_select_action_steps()
+        ▼
+robot.send_action(action_dict)   [downstream call site]
+```
+
+The adapter's relevant checks are structural rather than a complete numeric-safety policy:
+
+- Policy-side validation checks the expected keys, array type/dtype, shape and horizon.
+- The inspected adapter path converts action values to floating-point values but does not explicitly apply an `isfinite` check or an application-defined magnitude/position bound before returning the action dictionary.
+- Missing keys and malformed dimensions can raise structural exceptions. Such rejection is not evidence of numeric validation.
+
+These observations concern the inspected code path and revision. They should not be generalized to every GR00T embodiment, every evaluation path, or every configuration.
+
+## 4. Isolated test evidence
+
+The isolated harness used a fake policy and test doubles; it did not control a physical robot.
+
+| Input case | Observed adapter-side result | Interpretation |
+|---|---|---|
+| Ordinary finite value | Passed through | Expected structural path |
+| NaN in a joint value | Passed through as NaN | No adapter-side non-finite rejection observed |
+| +Inf in a joint value | Passed through as +Inf | No adapter-side non-finite rejection observed |
+| −Inf in a joint value | Passed through as −Inf | No adapter-side non-finite rejection observed |
+| Large finite value (for example, `1e100`) | Passed through in the isolated harness | No adapter-side magnitude rejection observed |
+| Missing `gripper` key | `KeyError` | Structural rejection |
+| Incorrect `single_arm` dimension | `IndexError` | Structural rejection |
+
+**Test boundary:** These results establish behaviour at the tested adapter-side boundary only. They do not establish what the real LeRobot follower, numeric conversion, motor-bus implementation, or physical actuator does with the values.
+
+Functions exercised in the isolated adapter-side tests:
+
+- `So100Adapter.decode_action_chunk`
+- `So100Adapter.get_action`
+- `_select_action_steps`
+
+in `gr00t/eval/real_robot/SO100/eval_so100.py`.
+
+## 5. Downstream driver behaviour: open verification item
+
+The GR00T project metadata pins a LeRobot revision, but this evidence record does not contain a reproducible end-to-end test proving the handling of NaN, ±Inf, or extreme finite values by the real driver and motor bus.
+
+In particular, the following must remain open until verified against the pinned source and a test that reaches the relevant code:
+
+- whether and where action values are unnormalised or clipped;
+- how NaN and infinities behave under the exact numeric operations used by the pinned implementation;
+- whether conversion to motor units or bus payload types rejects, clamps, transforms, or propagates such values;
+- whether the real `sync_write("Goal_Position", ...)` call can be reached with the tested inputs.
+
+Do not infer these outcomes from a fake `sync_write`, from generic Python numeric behaviour, or from the presence/absence of `max_relative_target` alone.
+
+No physical movement was performed or is claimed in this record.
+
+## 6. Mapping to EABC concepts
+
+This is a preliminary observation about an external path, not a conformance verdict for GR00T or LeRobot.
+
+| EABC concept | Evidence-supported statement |
+|---|---|
+| Complete Mediation | The inspected adapter path has no explicit numeric rejection for the tested invalid values. Complete mediation of the full actuator path has not been established or disproved by this adapter-only reproduction. |
+| Independent Execution Authority | No independent execution-authority decision is visible in the inspected adapter path. This observation alone is not a complete audit of every possible control path. |
+| Fail-closed semantics | The adapter-side path does not explicitly fail closed on the tested non-finite or extreme numeric values. Downstream behaviour remains unverified. |
+| Commit Gate | No explicit EABC Commit Gate was identified in the inspected adapter path before its `send_action()` call. |
+| Execution Attestation | This evidence run did not identify a commit-time attestation artifact binding an authorization decision to the physical effect. This is a scoped observation, not a system-wide absence proof. |
+
+This document does not claim that GR00T or LeRobot assert EABC conformance.
+
+## 7. What this evidence does not establish
+
+This record does **not** establish:
+
+- that invalid values reach the real motor-bus write in the pinned LeRobot implementation;
+- that physical motor movement occurred with invalid values;
+- exact downstream handling of NaN, ±Inf or large finite values;
+- behaviour under non-default driver configurations;
+- behaviour of other GR00T embodiments or evaluation paths;
+- that adding an `isfinite` check alone would constitute a complete EABC execution-authority boundary;
+- interoperability with any EGA or EABC implementation;
+- prepare/commit or time-of-check-to-time-of-use (TOCTOU) properties.
+
+## 8. Relationship to EABC / EGA work
+
+The observation is relevant to the general separation between policy output and authority to commit an externally observable effect:
+
+```text
+VLA policy output
         │
         ▼
-So100Adapter.decode_action_chunk()   ← float() conversion only; no isfinite / bounds check
+action adapter
         │
         ▼
-_select_action_steps()               ← length check only
-        │
-        ▼
-robot.send_action(action_dict)       ← LeRobot SO100Follower / SO101Follower
-        │
-        ▼
-[if max_relative_target is not None]
-  ensure_safe_goal_position()        ← relative clip only; default is None
-        │
-        ▼
-bus.sync_write("Goal_Position", ...) ← EFFECT (motor write path entered)
-Policy-level checks that run on this path
+send_action() / downstream actuator path
+```
 
-Server-side Gr00tPolicy.check_action: keys, np.ndarray, dtype=float32, shape (B,T,D), horizon match.
-No isfinite / NaN / Inf / magnitude checks.
+The adapter-side evidence identifies a place where explicit validation of non-finite and extreme values is not present in the inspected path. It does not demonstrate that a complete execution-authority boundary exists or is absent throughout the entire robot stack.
 
-Adapter checks
+A separate experiment could evaluate a gate before `send_action()`, with explicit allow/deny semantics and defined action constraints. Such an experiment would be an engineering demonstration, not by itself proof of EABC conformance and not a change to the normative EABC core.
 
-Structural only (missing key → KeyError; wrong dimension → IndexError).
-Non-finite and large finite values are forwarded unchanged.
+## 9. Reproduction and completion checklist
 
-4. Raw test evidence
-Isolated tests (fake policy, no hardware) established the following results at the adapter → pre-send_action boundary:
+### Adapter-side finding
 
+1. Check out the relevant NVIDIA/Isaac-GR00T revision.
+2. Load `So100Adapter` and its action-selection path, mocking optional dependencies if needed.
+3. Use a fake policy to provide NaN, ±Inf, large finite values, missing keys and malformed dimensions.
+4. Call `get_action()` and `_select_action_steps()`; inspect the resulting action dictionary.
+5. Record the exact revision, commands, test output and assertions.
 
+### Downstream verification still required
 
+1. Inspect the exact LeRobot revision pinned by the GR00T project metadata.
+2. Trace the real follower implementation through unit conversion and the motor-bus write method.
+3. Add a test using the real conversion/driver code with a recording or fake transport at the lowest practical boundary; do not use a physical robot for initial fault injection.
+4. Assert and record exactly what reaches the transport for each invalid input, including any exceptions, clamping, conversion or rejection.
+5. Keep the result explicitly scoped to the tested revision and configuration.
 
+Until that downstream test is complete, the conclusion must remain limited to the adapter-side validation gap.
 
+## 10. Classification and next step
 
+**Classification: D — adapter-side validation gap observed; end-to-end driver effect unverified.**
 
+This is a preliminary external-system observation, not validation of an EABC implementation and not evidence of physical actuation with invalid values.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-InputResult at action_dictClassificationNormal finitePassed throughExpectedNaN in jointPassed through as nanNon-rejection+Inf in jointPassed through as infNon-rejection−Inf in jointPassed through as -infNon-rejectionLarge finite (1e10)Passed through unchangedNon-rejectionMissing "gripper" keyKeyErrorStructural rejectionWrong single_arm dimensionIndexErrorStructural rejection
-Exact functions under test:
-
-So100Adapter.decode_action_chunk
-So100Adapter.get_action
-_select_action_steps
-
-in gr00t/eval/real_robot/SO100/eval_so100.py.
-5. Driver behaviour (default configuration)
-Inspected at LeRobot commit c75455a6de5c818fa1bb69fb2d92423e86c70475:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-MechanismDefaultEffect on NaN / Inf / large valuesmax_relative_targetNoneRelative safety clip disabledensure_safe_goal_positionOnly if max_relative_target setArithmetic clip; does not reject NaN_unnormalize (RANGE_M100_100 / RANGE_0_100)Always on write pathClamps Inf/large to normalised extremes; NaN may be coerced by min/max then written as extreme finite
-Conclusion from source + reproduction: with the default configuration, non-finite and large values reach the motor-write call site. There is no explicit fail-closed rejection of invalid actions before sync_write.
-No real-hardware movement was performed or claimed.
-6. Mapping to EABC properties
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-EABC propertyObserved status on this pathComplete MediationNot satisfied. Invalid actions reach the protected effect without an intervening execution-authority decision.Independent Execution AuthorityNot present. Policy output and actuator path are not separated by an independent authority boundary.Fail-closed semanticsNot present for non-finite / extreme values. Invalid inputs are forwarded or silently coerced, not denied.Commit GateAbsent. No explicit allow/deny transition before Goal_Position write.Execution Attestation (EAtt)Absent. No commit-time evidence artifact binding decision to effect.
-This is an observation of a non-conforming external path, not a claim that GR00T or LeRobot claim EABC conformance.
-7. What this evidence does not establish
-This record does not establish:
-
-that physical motor movement occurred with invalid values;
-behaviour of non-default LeRobot configurations (max_relative_target set);
-behaviour of other GR00T embodiments or eval paths;
-that a minimal isfinite guard would constitute a full EABC boundary;
-interoperability with any EGA or EABC implementation;
-prepare/commit TOCTOU properties (see Validation Run 002 plan).
-
-8. Relationship to EABC / EGA work
-This path is a concrete instance of the problem EABC is designed to address:
-textAuthorization / decision domain (VLA policy output)
-        │
-        │  ← no execution-authority boundary
-        ▼
-Execution domain (motor Goal_Position write)
-It is a candidate negative example for:
-
-Complete Mediation,
-fail-closed behaviour on protected effects,
-the absence of a Commit Gate before externally observable robotic actuation.
-
-A future EGA-style experiment could insert a minimal Commit Gate before send_action (finite + bounds check, explicit deny, optional attestation log) without requiring changes to the normative EABC core.
-9. Reproduction checklist
-An independent reviewer can reproduce the adapter-boundary results by:
-
-Checking out NVIDIA/Isaac-GR00T.
-Loading So100Adapter (with mocks for optional lerobot / transformers deps if needed).
-Supplying a fake policy that returns action chunks containing NaN, ±Inf, large finite, missing keys, and wrong dimensions.
-Calling get_action + _select_action_steps and inspecting the resulting action_dict.
-Confirming that non-finite / large values appear unchanged in the dict that would be passed to robot.send_action().
-Inspecting LeRobot so100_follower.py / so101_follower.py and motors_bus.py at the pinned commit for default max_relative_target=None and lack of explicit isfinite rejection before sync_write.
-
-No hardware and no trust in narrative claims are required for the adapter-boundary results.
-10. Next steps (non-normative)
-
-Preserve this record under evidence/ as an external negative-path observation.
-Optionally add a corresponding illustrative robotic scenario under examples/ showing how an EABC-conformant boundary would mediate the same path.
-Optionally prototype a minimal Commit Gate experiment (EGA-style) in front of send_action as a separate engineering exercise — without treating that prototype as an EABC requirement.
-
-
-Classification: External observation — non-conforming pre-actuation path.
-
-Not a validation of any EABC implementation.
+The next evidence-producing step is to verify the pinned LeRobot conversion and motor-bus path with a reproducible test. Do not upgrade the classification to a confirmed motor-write-path finding until that evidence exists.
