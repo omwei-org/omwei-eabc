@@ -110,6 +110,18 @@ For those default normalized modes, `MotorsBus._unnormalize()` clamps values usi
 
 These are normalized endpoints, which are then mapped using the motor calibration ranges. Thus, in the default normalized path, the source does not show these inputs being rejected by a finite-number check; it shows them being converted to endpoint targets. The endpoint targets are numeric and can proceed through sign encoding and serialization if the bus is connected, calibration is present, and the remaining driver/SDK operations succeed.
 
+The `Goal_Position` register is configured as a two-byte value in the pinned Feetech control table. `_serialize_data()` checks that the value is a non-negative integer that fits the selected byte width; for a two-byte register, the maximum is `65535`. Because the default normalized modes first convert values into the calibrated position range, NaN/±Inf do not remain non-finite by the time serialization is attempted.
+
+### Non-default `use_degrees=True` path
+
+The source has a different branch when `use_degrees=True` selects `MotorNormMode.DEGREES` for the five body joints. That branch computes an integer from the degree value without the normalized-mode clamp:
+
+- `NaN` raises `ValueError` during integer conversion;
+- `+Inf` and `-Inf` raise `OverflowError`;
+- an extreme finite degree value can produce an integer outside the two-byte serialization range and then be rejected by `_serialize_data()`.
+
+This is a source-level consequence of the conversion and serialization code, not a runtime transport test. The gripper remains configured with `RANGE_0_100` in the shown SO100 implementation.
+
 ### What remains unverified
 
 The source path proceeds from `send_action()` to `sync_write("Goal_Position", ...)`, then through unnormalization, sign encoding, byte serialization and the Feetech sync-writer setup / packet-send call. However, this evidence record still does **not** contain a runtime test with the pinned implementation and a recording transport proving the exact values submitted to the SDK or transport.
