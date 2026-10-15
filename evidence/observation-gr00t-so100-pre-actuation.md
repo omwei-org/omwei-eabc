@@ -227,3 +227,8 @@ No hardware and no trust in narrative claims are required for the adapter-bounda
 Preserve this record under evidence/ as an external negative-path observation.
 Optionally add a corresponding illustrative robotic scenario under examples/ showing how an EABC-conformant boundary would mediate the same path.
 Optionally prototype a minimal Commit Gate experiment (EGA-style) in front of send_action as a separate engineering exercise — without treating that prototype as an EABC requirement.
+
+
+Classification: External observation — non-conforming pre-actuation path.
+
+Not a validation of any EABC implementation.
