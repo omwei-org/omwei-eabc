@@ -1,0 +1,45 @@
+name: Pinned LeRobot SO100 driver reproduction
+
+on:
+  push:
+    paths:
+      - "evidence/scripts/test_pinned_lerobot_driver.py"
+      - ".github/workflows/pinned-driver-test.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  driver-reproduction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out evidence harness
+        uses: actions/checkout@v4
+
+      - name: Check out exact pinned LeRobot source
+        uses: actions/checkout@v4
+        with:
+          repository: huggingface/lerobot
+          ref: c75455a6de5c818fa1bb69fb2d92423e86c70475
+          path: lerobot
+
+      - name: Verify source pin
+        run: |
+          actual="$(git -C lerobot rev-parse HEAD)"
+          echo "LeRobot checkout: $actual"
+          test "$actual" = "c75455a6de5c818fa1bb69fb2d92423e86c70475"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install minimal dependencies for the real conversion modules
+        run: python -m pip install --disable-pip-version-check pyserial deepdiff tqdm
+
+      - name: Run pinned driver conversion and recording SDK-boundary test
+        env:
+          LEROBOT_SRC: ${{ github.workspace }}/lerobot/src
+        run: python evidence/scripts/test_pinned_lerobot_driver.py
