@@ -14,6 +14,8 @@ from pathlib import Path
 
 PIN = "c75455a6de5c818fa1bb69fb2d92423e86c70475"
 src = Path(os.environ["LEROBOT_SRC"]).resolve()
+# Import the checked-out source tree directly; do not install a different LeRobot build.
+sys.path.insert(0, str(src))
 assert (src / "lerobot/motors/motors_bus.py").is_file(), src
 # The workflow checks out this exact source revision before invoking the test.
 print(f"LE ROBOT SOURCE: {src}")
