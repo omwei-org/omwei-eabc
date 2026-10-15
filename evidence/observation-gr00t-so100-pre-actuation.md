@@ -207,3 +207,52 @@ Until that downstream test is complete, the conclusion must remain limited to th
 This is a preliminary external-system observation, not validation of an EABC implementation and not evidence of physical actuation with invalid values.
 
 The next evidence-producing step is a recording-transport test against the pinned LeRobot conversion and motor-bus code. The source trace strengthens the concern from an adapter-only observation to a plausible downstream path, but do not classify the runtime motor-write path as confirmed until that test exists.
+
+
+## 8. Runtime reproduction — pinned LeRobot driver conversion and mocked SDK boundary
+
+**Run:** [Pinned LeRobot SO100 driver reproduction — run 38775382201](https://github.com/omwei-org/omwei-eabc/actions/runs/38775382201)  
+**Result:** PASS (workflow conclusion: `success`)  
+**Harness commit:** `099cff7446085c8867cf6a79d9d73784257f042e`  
+**Upstream LeRobot SHA:** `c75455a6de5c818fa1bb69fb2d92423e86c70475` (verified in the workflow before the test)  
+**Python:** CPython 3.11.17  
+**Command:** `python evidence/scripts/test_pinned_lerobot_driver.py`
+
+The first run, [38749028591](https://github.com/omwei-org/omwei-eabc/actions/runs/38749028591), failed before executing cases because the checkout's `lerobot/src` directory was not on `sys.path` (`ModuleNotFoundError: No module named 'lerobot'`). The harness was corrected to import from that checked-out source tree, without replacing the driver implementation. The subsequent run above completed and its job logs were inspected.
+
+The harness imports the pinned `Motor`, `MotorCalibration`, `MotorNormMode`, and `FeetechMotorsBus` implementations. It calls the real `FeetechMotorsBus.sync_write("Goal_Position", ...)` conversion/serialization path. Only unrelated utility imports and the `scservo_sdk` transport classes are stubbed. The recording `GroupSyncWrite.addParam()` captures the exact byte list the real driver passes to the mocked SDK boundary; `txPacket()` returns success without sending anything. The workflow does not install or use a different LeRobot implementation.
+
+### Captured case results
+
+Register address was `42` and register width was `2` bytes for all body-joint cases. Payloads below are the exact byte lists recorded by the mocked SDK's `GroupSyncWrite.addParam()`, in serialization order.
+
+| Case | Mode / input | Runtime outcome | Captured bytes | Interpretation |
+|---|---|---|---|---|
+| finite_mid | `RANGE_M100_100`, `0.0` | write attempted | `[255, 7]` | converted to calibrated midpoint register value 2047 |
+| NaN | `RANGE_M100_100`, `NaN` | write attempted | `[0, 0]` | clamped/converts to lower endpoint 0 |
+| +Inf | `RANGE_M100_100`, `+Inf` | write attempted | `[255, 15]` | clamped/converts to upper endpoint 4095 |
+| −Inf | `RANGE_M100_100`, `−Inf` | write attempted | `[0, 0]` | clamped/converts to lower endpoint 0 |
+| huge positive | `RANGE_M100_100`, `1e100` | write attempted | `[255, 15]` | clamped/converts to upper endpoint 4095 |
+| huge negative | `RANGE_M100_100`, `-1e100` | write attempted | `[0, 0]` | clamped/converts to lower endpoint 0 |
+| degrees NaN | `DEGREES`, `NaN` | `ValueError: cannot convert float NaN to integer` | none | rejected during integer conversion |
+| degrees +Inf | `DEGREES`, `+Inf` | `OverflowError: cannot convert float infinity to integer` | none | rejected during integer conversion |
+| degrees −Inf | `DEGREES`, `−Inf` | `OverflowError: cannot convert float infinity to integer` | none | rejected during integer conversion |
+| degrees huge positive | `DEGREES`, `1e100` | `ValueError` — sign-encoding magnitude exceeds 32767 | none | rejected by the real sign-encoding range check |
+| degrees huge negative | `DEGREES`, `-1e100` | `ValueError` — sign-encoding magnitude exceeds 32767 | none | rejected by the real sign-encoding range check |
+| gripper NaN | `RANGE_0_100`, `NaN` | write attempted; raw register 0 | `[0, 0]` | lower endpoint |
+| gripper +Inf | `RANGE_0_100`, `+Inf` | write attempted; raw register 4095 | `[255, 15]` | upper endpoint |
+| gripper −Inf | `RANGE_0_100`, `−Inf` | write attempted; raw register 0 | `[0, 0]` | lower endpoint |
+
+The workflow log ends with: `PASS: 14 cases exercised against pinned LeRobot conversion/write code; no hardware connected.`
+
+### Scope and cases not covered
+
+This is a **runtime test of pinned LeRobot motor-bus conversion/serialization**, and the captured bytes are evidence of the payload passed to a **mocked SDK boundary**. It is not a full runtime test of `SO100Follower.send_action()` or the complete GR00T-to-robot call path. In particular:
+
+- The harness does not instantiate `SO100Follower` or execute its relative-target clipping logic. The `max_relative_target=None` default and configured clipping branch were therefore **not runtime-tested** in this run.
+- The ordinary finite case is the midpoint `0.0`; other finite in-range values were not sampled.
+- The test captures bytes passed to the mock. It does not prove that a real serial packet was sent, received, accepted by a motor, or caused motion.
+- No physical robot was connected and no physical actuation is claimed.
+- These 14 cases do not establish complete path-set coverage for GR00T, LeRobot, or a deployed robot system.
+
+Evidence levels remain distinct: (1) adapter-only reproduction; (2) runtime test of the pinned LeRobot motor-bus driver conversion/serialization; (3) payload captured at a mocked SDK boundary; (4) actual physical actuation — **not tested**.
