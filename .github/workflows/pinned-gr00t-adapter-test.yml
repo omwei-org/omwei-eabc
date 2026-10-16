@@ -1,0 +1,35 @@
+name: Pinned GR00T SO100 adapter characterization
+
+on:
+  push:
+    paths:
+      - "evidence/scripts/test_pinned_gr00t_adapter.py"
+      - ".github/workflows/pinned-gr00t-adapter-test.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  adapter-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout pinned NVIDIA GR00T source
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA/Isaac-GR00T
+          ref: d2b7e75b937e3ec9aa5dbc798f08b89692c49734
+          path: _gr00t
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: python -m pip install numpy pytest
+      - name: Verify pinned revision and run characterization
+        env:
+          GR00T_SRC: ${{ github.workspace }}/_gr00t
+        run: |
+          test "$(git -C _gr00t rev-parse HEAD)" = "d2b7e75b937e3ec9aa5dbc798f08b89692c49734"
+          python -m pytest -q evidence/scripts/test_pinned_gr00t_adapter.py
