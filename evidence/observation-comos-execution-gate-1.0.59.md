@@ -46,7 +46,7 @@ Ron reported 21 attempts across the following cases.
 | Hub-signed stranger request naming `order_create` or `inventory_set` | Refused as `ask_not_public` | Tested network request types only |
 | Hub-signed `payment_confirm` | Can move an existing pending order to paid without the execution gate | Settlement path is distinct from the sale-creation gate |
 | Operator-local `inventory_set` tool | Changes stock without the gate | Local operator path is outside the brokered-sale gate |
-| Operator-local order paths | Local ComS order refused in the reported store; local card order refused because no money account was configured | Store/configuration-specific observations; not a general absence claim |
+| Operator-local order paths | Local Coms order refused in the reported store; local card order refused because no money account was configured | Store/configuration-specific observations; not a general absence claim |
 | Direct database write using the node's database access | Reportedly succeeds in inserting a paid order and decrementing stock by two units | Demonstrates a path available to a process holding those database credentials in the tested setup |
 
 The table summarizes the maintainer's report. It is not a substitute for the raw JSON output, logs, or before/after database records.
