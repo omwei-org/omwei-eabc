@@ -1,5 +1,7 @@
 # Validation Run 002 — Prepare / Authority Change / Commit
 
+> **Disambiguation:** This cross-organization prepare/authority-change plan is distinct from the HALOS/GIE single-implementation control pair in [halos-run-002-003-control-pair.md](./halos-run-002-003-control-pair.md).
+
 **Status:** Planned validation experiment  
 **Purpose:** Validate commit-time authority semantics under a real authority-state change between preparation and commit.
 
