@@ -1,5 +1,7 @@
 # HALOS Prepare / Commit Control Pair — Runs 002 and 003
 
+> **Disambiguation:** This HALOS/GIE single-implementation control pair is distinct from the cross-organization prepare/authority-change plan in [validation-run-002-plan.md](./validation-run-002-plan.md).
+
 **Status:** Implementation evidence  
 **Scope:** EABC/GIE governed physical execution path  
 **Source repository:** `omwei-org/halos-1.3-atl-analysis`  

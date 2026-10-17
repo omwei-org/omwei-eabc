@@ -1,5 +1,7 @@
 # Evidence Reference — GR00T SO100/SO101 Pre-Actuation Path
 
+**Update:** Sections 11 and 12 record later runtime tests at the mocked SDK boundary; physical actuation remains untested.
+
 **Status:** Adapter-side gap reproduced; downstream driver path source-traced; transport-level reproduction remains open  
 **Analysis date:** 2026-10-15  
 **Scope:** Action validation in the NVIDIA Isaac-GR00T SO100 evaluation path, from policy output to the call site that invokes LeRobot's `send_action()`.
@@ -209,7 +211,7 @@ This is a preliminary external-system observation, not validation of an EABC imp
 The next evidence-producing step is a recording-transport test against the pinned LeRobot conversion and motor-bus code. The source trace strengthens the concern from an adapter-only observation to a plausible downstream path, but do not classify the runtime motor-write path as confirmed until that test exists.
 
 
-## 8. Runtime reproduction — pinned LeRobot driver conversion and mocked SDK boundary
+## 11. Runtime reproduction — pinned LeRobot driver conversion and mocked SDK boundary
 
 **Run:** [Pinned LeRobot SO100 driver reproduction — run 38775382201](https://github.com/omwei-org/omwei-eabc/actions/runs/38775382201)  
 **Result:** PASS (workflow conclusion: `success`)  
@@ -258,7 +260,7 @@ This is a **runtime test of pinned LeRobot motor-bus conversion/serialization**,
 Evidence levels remain distinct: (1) adapter-only reproduction; (2) runtime test of the pinned LeRobot motor-bus driver conversion/serialization; (3) payload captured at a mocked SDK boundary; (4) actual physical actuation — **not tested**.
 
 
-## 11. Follow-up runtime test — actual pinned SO100Follower.send_action()
+## 12. Follow-up runtime test — actual pinned SO100Follower.send_action()
 
 **Run:** [Pinned LeRobot SO100 driver reproduction — run 38776033231](https://github.com/omwei-org/omwei-eabc/actions/runs/38776033231)  
 **Status:** PASS; full job logs inspected  

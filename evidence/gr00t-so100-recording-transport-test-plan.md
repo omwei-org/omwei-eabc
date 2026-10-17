@@ -61,3 +61,5 @@ No result at a lower level establishes a higher level. Do not claim that a physi
 ## Current status
 
 This file specifies the next experiment; it does not itself constitute a test result. The current evidence document remains accurate in classifying the downstream transport effect as unverified until the test runs and its output is recorded.
+
+Status update: The experiment has since been run: [run 38775382201](https://github.com/omwei-org/omwei-eabc/actions/runs/38775382201) and [run 38776033231](https://github.com/omwei-org/omwei-eabc/actions/runs/38776033231).
