@@ -65,6 +65,8 @@ The following JSON is reproduced verbatim from the two real journal entries supp
 ]
 ```
 
+**Hash recomputation note:** For hash recomputation, entry 1's `prev_hash` is `0000000000000000000000000000000000000000000000000000000000000000` (0 repeated 64 times). With the literal text `000...000`, the published `entry_hash` does NOT reproduce.
+
 **Important source-data note:** the public JSON representation of entry 1 omits `reason`. The value `reason = ""` is nevertheless part of the fixed-order hash input described below. The verbatim public entries above are preserved as supplied; the canonical hash-input reconstruction is documented separately in Section 3.
 
 ## 3. Exact independent hash-verification recipe
