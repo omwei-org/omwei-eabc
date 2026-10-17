@@ -29,6 +29,12 @@ According to Ron, the script runs the node's act loop and sale handler against a
 
 The exact package, manifest signature, script, JSON output, and raw database snapshots have **not** been independently verified as part of this evidence record. Statements about the run below are attributed to Ron's report, not presented as an independently reproduced result.
 
+### Node's hub-key selection (clarification from Ron)
+
+The node reads the optional `COMOS_HUB_ACT_PUBLIC_KEY` setting as a base64-encoded Ed25519 SPKI public key. When set, it selects that key instead of the release-pinned key; when absent, it uses the release pin. Ron reports that the test script generates a throwaway Ed25519 key pair and sets the variable in its own process before the node code loads. It does not write `.env`; its only output file is the JSON report. This is an operator-supported configuration path, not a test-only code path. Using it requires the same access to node configuration as changing the gate URL or replacing the binary. At startup, the node logs the active key ID (`kid`) and whether it came from the release pin or the setting. A malformed key or a key that is not Ed25519 stops the ACT loop rather than allowing unverified processing.
+
+This clarification does not change the evidence status above: the package, script, report, and runtime behaviour remain maintainer-reported until independently inspected. Nor does it remove the operator from the trust boundary. The node README states that the local database has no password and that the operator is the trust boundary; this should remain visible in the record rather than being omitted for a tidier summary.
+
 ## 2. Reported test results
 
 Ron reported 21 attempts across the following cases.
@@ -44,7 +50,7 @@ Ron reported 21 attempts across the following cases.
 | Same signed act delivered twice | Second delivery returns existing order; no second reservation | Reported idempotency for the tested replay |
 | Payload altered without updating digest / digest recomputed without valid signature / unsigned act / different hub key / expired act | Reported refusals; stock unchanged | Reported act-binding, signature, and expiry checks |
 | Hub-signed stranger request naming `order_create` or `inventory_set` | Refused as `ask_not_public` | Tested network request types only |
-| Hub-signed `payment_confirm` | Can move an existing pending order to paid without the execution gate | Settlement path is distinct from the sale-creation gate |
+| Hub-signed `payment_confirm` | Can move an existing pending order to paid without the execution gate | This is a node-side state update recording a settlement already performed by the hub; the node does not move Coms. The ACT requires the hub's settlement reference and transitions only a pending order. The hub owns the financial-settlement guarantee. |
 | Operator-local `inventory_set` tool | Changes stock without the gate | Local operator path is outside the brokered-sale gate |
 | Operator-local order paths | Local Coms order refused in the reported store; local card order refused because no money account was configured | Store/configuration-specific observations; not a general absence claim |
 | Direct database write using the node's database access | Reportedly succeeds in inserting a paid order and decrementing stock by two units | Demonstrates a path available to a process holding those database credentials in the tested setup |
@@ -62,6 +68,7 @@ Subject to independent verification of the artifacts, the reported run supports 
 - The tested handler uses `command_id` to make a repeated delivery return the existing order rather than reserve stock a second time.
 - The gate decision described in the report is an ordinary HTTP response whose trust depends on control of the configured endpoint; a correctly echoing local process does not need to provide a signature.
 - The gate is optional: with its URL unset, the tested brokered sale can execute without an external authorization decision.
+- The protected effect of this node-side gate is **sale reservation and order creation**: creating the order and reserving stock. It does not protect the movement of Coms. The hub settles only after the node receipt matches the bound sale, then queues `payment_confirm` to record that already-completed settlement on the node.
 - Other operator-local or direct-database paths can change relevant state outside the tested brokered-sale gate.
 
 ### 3.2 Mapping to EABC concepts
