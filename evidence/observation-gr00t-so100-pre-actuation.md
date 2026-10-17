@@ -1,5 +1,7 @@
 # Evidence Reference — GR00T SO100/SO101 Pre-Actuation Path
 
+**Update:** Sections 11 and 12 record later runtime tests at the mocked SDK boundary; physical actuation remains untested.
+
 **Status:** Adapter-side gap reproduced; downstream driver path source-traced; transport-level reproduction remains open  
 **Analysis date:** 2026-10-15  
 **Scope:** Action validation in the NVIDIA Isaac-GR00T SO100 evaluation path, from policy output to the call site that invokes LeRobot's `send_action()`.
