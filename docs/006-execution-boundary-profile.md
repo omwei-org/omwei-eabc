@@ -1,6 +1,6 @@
 # 006 — Execution Boundary Profile (EBP)
 
-**Status:** Draft v0.1 (design-notes promoted to normative-style prose; not yet cross-reviewed against `docs/002` and `docs/004`for terminology drift)
+**Status:** Draft v0.1 (open items updated; design-notes promoted to normative-style prose; not yet cross-reviewed against `docs/002` and `docs/004`for terminology drift)
 
 ## 0. Purpose and Scope
 
@@ -215,3 +215,16 @@ This crosswalk confirms the document's overall thesis numerically: EBP adds one 
 - Full clause-by-clause cross-check against `docs/002` (evidence model) and `docs/004` (conformance levels) has not yet been performed for this document specifically — the eight-vs-nine-category distinction in §5 was verified against actual repo content during drafting, but the interaction between EBP's conformance levels and Core's existing Property/Evidence/Profile conformance levels (`docs/004`) is not yet written up.
 - No implementation profile yet references EBP (EGA/SIF v1, `profiles/ega-sif-v1.md`, predates this document).
 - Binding mechanism for instance identity (§4.1) is deliberately left open; a future profile document may wish to recommend one without making it normative at the EBP level.
+- **Threat-model authorship and approval (proposed, not yet reviewed):** §2.2 requires the threat model to be stated but does not specify who authors it, who signs it, or who approves changes. §6 leaves Execution Boundary Policy to an external, deployment-supplied input. Open: whether the conformance record should identify a named, accountable threat-model author and an independent countersigner.
+- **Definition of material change (proposed, not yet reviewed):** §3 triggers Assessment on "each material change to i" without defining material change. Open: which changes require reassessment and how the permitted exceptions are recorded.
+- **Crosswalk classification (proposed, not yet reviewed):** decide later whether any elements arising from the proposed threat-model governance or material-change rules are NEW, EXTEND, or REUSE; no elements are added to the locked §7 crosswalk by this proposal.
+
+### Proposed direction (not normative)
+
+The following directions are proposed, not yet reviewed. They do not change the normative requirements or locked invariants above.
+
+**Threat-model authorship and approval (proposed, not yet reviewed).** The conformance record would be INVALID if it lacks (a) a named, accountable author of the threat model and (b) an independent countersigner. A threat-model change would not become effective until countersigned. Independence would mean that the author and approver do not share a reporting line with the party that ships the implementation. This is the organizational analogue of the Independence property in §2.
+
+**Material change (proposed, not yet reviewed).** Rather than attempting an exhaustive definition of material change, the conformance record would enumerate changes permitted without reassessment. Every other change would be material by default. An undefined change would fall under the existing tri-state rule in §3.2 and be treated as INVALID or INDETERMINATE, never VALID.
+
+**Enforcement limitation.** The specification cannot create a red team, allocate its budget, or enforce organizational reporting lines. It can only make the conformance record invalid when the required authorship or countersignature fields are missing. Whether the organizational independence is genuine remains an assurance and governance question.
