@@ -134,7 +134,9 @@ EABC standardizes properties and evidence, not mechanisms.
 ```text
 /
 ├── docs/
-│   └── Core EABC specification
+│   ├── Core EABC specification
+│   └── methodology/
+│       └── EABC-IMPLEMENTATION-PROFILE-TEMPLATE.md
 │
 ├── profiles/
 │   └── Implementation mappings
@@ -160,6 +162,8 @@ Core documents:
 | Evidence Model                  | Verification requirements         |
 | Failure and Execution Semantics | Lifecycle semantics               |
 | Conformance                     | Compatibility requirements        |
+
+The [Implementation Profile Template](./docs/methodology/EABC-IMPLEMENTATION-PROFILE-TEMPLATE.md) is a separate, non-normative methodology aid. It does not add EABC properties, requirements, or conformance levels.
 
 ---
 
