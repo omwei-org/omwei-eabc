@@ -155,16 +155,17 @@ profiles/
 
 Each profile is evaluated independently for conformance with the EABC specification.
 
+## Profile authoring methodology
+
+A separate, non-normative [Implementation Profile Template](../docs/methodology/EABC-IMPLEMENTATION-PROFILE-TEMPLATE.md) provides a reusable structure for declaring scope, failure modes, status, threat model, artifacts, and falsification conditions. It creates no EABC property, requirement, or conformance level; its starter exit classes are not a mandatory taxonomy.
 
 ## Listed Independent Profiles
 
 - [CUSTOS-CORE](CUSTOS-CORE.md) — independent implementation profile, indexed by reference to commit-pinned source documents. Its exit-class register is useful for comparison; a second independently produced profile would test whether the vocabulary holds without either author having to explain their terms. Two classes are declared open and two closed only within stated boundaries. The register does not aggregate these statuses into a conformance level. The repository's tests detect specific pre-registered weakenings under the stated test design; they do not establish non-bypassability.
 
-
 ## Listed Joint Architectural Mappings
 
 - [Bounded Routing V5 — Independent Structural Witness](../docs/EABC_IP_BR_V5_001.md) — frozen joint architectural mapping by Stanislav Levarsky and Stephen Gettel. The underlying Bounded Routing V5 architecture was independently developed; the EABC mapping is joint, not an independently authored mapping. The profile records partial property correspondence and explicitly does not claim full EABC conformance. Its frozen source is anchored at Bounded Routing commit `1a3a5495903ae08d8acc3f93c7a7460a059dad2b`; profile content SHA-256: `b87df53bd45f9d5ea296efb1cb93292b9d41fe115f02c8cde1484f55eb9b90c4`.
-
 
 ---
 
