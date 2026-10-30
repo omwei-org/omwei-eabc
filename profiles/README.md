@@ -163,8 +163,7 @@ Each profile is evaluated independently for conformance with the EABC specificat
 
 ## Listed Joint Architectural Mappings
 
-- [Bounded Routing V5 — Independent Structural Witness](../docs/EABC_IP_BR_V5_001.md) — frozen joint architectural mapping by Stanislav Levarsky and Stephen Gettel. The underlying Bounded Routing V5 architecture was independently developed; the EABC mapping is joint, not an independently authored mapping. The profile records partial property correspondence and explicitly does not claim full EABC conformance. Its frozen source is anchored at Bounded Routing commit `1a3a5495903ae08d8acc3f93c7a7460a059dad2b`; profile content SHA-256: `b87df53bd45f9d5ea296efb1cb93292b9d41fe115f02c8cde1484f55eb9b90c4`.
-
+- [Bounded Routing V5 — Independent Structural Witness](../docs/EABC_IP_BR_V5_001.md) — frozen joint architectural mapping by Stanislav Levarsky and Stephen Gettel. The underlying Bounded Routing V5 architecture was independently developed; the EABC mapping is joint, not an independently authored mapping. The profile records partial property correspondence and explicitly does not claim full EABC conformance. Frozen V5 implementation reference: `154b389af2d3ec54f50ae7216dea35c2c065b39b`, matching the reference recorded in the profile. Profile content SHA-256: `b87df53bd45f9d5ea296efb1cb93292b9d41fe115f02c8cde1484f55eb9b90c4`.
 
 ---
 
@@ -176,4 +175,4 @@ They describe how an existing architecture satisfies the EABC contract.
 
 They do not redefine, extend, or replace the normative requirements established by the core EABC specification.
 
-This separation allows EABC to remain implementation-neutral while enabling diverse execution-authority architectures to demonstrate interoperability through a common contractual model.
+This separation allows EABC to remain implementation-neutral while enabling diverse architectures to demonstrate interoperability through a common contractual model.
