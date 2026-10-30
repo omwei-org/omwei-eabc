@@ -155,6 +155,12 @@ profiles/
 
 Each profile is evaluated independently for conformance with the EABC specification.
 
+
+## Listed Independent Profiles
+
+- [CUSTOS-CORE](CUSTOS-CORE.md) — independent implementation profile, indexed by reference to commit-pinned source documents. Its exit-class register is useful for comparison; a second independently produced profile would test whether the vocabulary holds without either author having to explain their terms. Two classes are declared open and two closed only within stated boundaries. The register does not aggregate these statuses into a conformance level. The repository's tests detect specific pre-registered weakenings under the stated test design; they do not establish non-bypassability.
+
+
 ---
 
 # Design Principle
