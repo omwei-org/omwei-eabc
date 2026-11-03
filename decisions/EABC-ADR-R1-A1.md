@@ -277,7 +277,11 @@ The original P5 requirement contains two distinct obligations:
 
 The first obligation is refined through `INTEGRITY_STATE(B,E)`. `INTEGRITY_STATE(B,E)` concerns the authenticity and determination-binding of the runtime state evaluated or relied upon by B when making its determination.
 
-The second obligation remains independently applicable. It concerns whether execution occurred against the intended state. It is a consumer-facing execution-state correspondence claim and MUST NOT be treated as automatically satisfied by establishing the authenticity or determination-binding of the state evaluated by B.
+The second obligation remains independently applicable. It concerns whether execution occurred against the intended state. For this obligation, the intended state is the reference state, condition, or state-dependent execution condition designated by the applicable authorization and execution semantics as the basis against which the authorized effect is to occur. The applicable semantics MUST make that reference identifiable, either directly or through an unambiguous reference to an authoritative state or condition.
+
+The consumer-facing execution-state correspondence claim MUST permit a consumer to determine whether the state or condition applicable when the effect occurred corresponded to that intended reference, taking account of any state evolution or transition expressly permitted by the applicable authorization and execution semantics. Where those semantics require an unchanged state, correspondence requires that condition to hold; where they expressly permit defined state evolution, correspondence is assessed against those permitted conditions. The intended reference MUST NOT be retrospectively redefined merely to match the state observed after execution.
+
+This is a consumer-facing execution-state correspondence claim and MUST NOT be treated as automatically satisfied by establishing the authenticity or determination-binding of the state evaluated by B.
 
 The two claims are related but distinct. Evidence establishing `INTEGRITY_STATE(B,E)` does not, by itself, establish that execution occurred against the intended state. Evidence establishing execution-state correspondence does not, by itself, establish the authenticity and determination-binding required by `INTEGRITY_STATE(B,E)`.
 
@@ -287,9 +291,9 @@ The original P5 consumer-facing obligation MUST remain in force after migration 
 
 #### 2.3.1 Normative subject and definition
 
-`INTEGRITY_CTX(C,B,E)` establishes the authenticity and integrity of the binding among execution context C, boundary B, and Protected Effect E.
+`INTEGRITY_CTX(C,B,E)` establishes the authenticity and integrity of execution context C as applicable to the determination, and of the binding among that context, boundary B, and Protected Effect E.
 
-Context C means the execution-relevant circumstances that determine the scope, conditions, and applicability of B's determination to E and its associated effect.
+Context C means the execution-relevant circumstances that determine the scope, conditions, and applicability of B's determination to E and its associated effect. The context's authenticity includes the provenance and integrity of its constituent elements from the source or sources designated as authoritative by the applicable context and authorization semantics, through their acceptance or use by B. Where context is derived, transformed, aggregated, or relayed, the applicable semantics MUST make its source provenance and relevant transformations identifiable and sufficiently protected against unauthorized substitution or misrepresentation. This requirement does not presume that every context element originates outside the governed system; it requires the declared authority and provenance rules for each relevant element to be respected.
 
 Context concerns the circumstances in which the determination is made and the effect to which it applies. It is distinct from the runtime state that B evaluates in making the determination.
 
@@ -300,13 +304,15 @@ The context MUST be defined sufficiently to identify which context elements dete
 For `INTEGRITY_CTX(C,B,E)` to be satisfied:
 
 1. The context C applicable to the determination MUST be identifiable.
-2. The binding among C, B, and E MUST be authentic and integrity-protected.
-3. The binding MUST be established no later than the determination on E.
-4. The binding MUST identify the boundary B that made the determination and the Protected Effect E to which that determination applies.
-5. The binding MUST remain valid from the determination on E through the occurrence of the effect to which that determination applies.
-6. The binding MUST NOT be silently substituted, broken, or misattributed during that interval.
-7. Any context change that falls outside the context evolution explicitly permitted by the declared semantics MUST invalidate the existing binding for the affected effect. A new determination or an explicitly authorized revalidation and rebinding MUST occur before the effect may rely on the changed context.
-8. Evidence MUST allow an assessor to establish that the effect being attributed to the determination is the effect associated with the bound context and boundary.
+2. The source or sources designated as authoritative for each relevant context element, and the provenance of any derived or transformed context, MUST be identifiable under the declared context semantics.
+3. The context elements used by B MUST be authentic and integrity-protected against unauthorized substitution, alteration, or misrepresentation from their authoritative source or defined derivation through their use in the determination.
+4. The binding among C, B, and E MUST itself be authentic and integrity-protected.
+5. The binding MUST be established no later than the determination on E.
+6. The binding MUST identify the boundary B that made the determination and the Protected Effect E to which that determination applies.
+7. The binding MUST remain valid from the determination on E through the occurrence of the effect to which that determination applies.
+8. The binding MUST NOT be silently substituted, broken, or misattributed during that interval.
+9. Any context change that falls outside the context evolution explicitly permitted by the declared semantics MUST invalidate the existing binding for the affected effect. A new determination or an explicitly authorized revalidation and rebinding MUST occur before the effect may rely on the changed context.
+10. Evidence MUST allow an assessor to establish that the effect being attributed to the determination is the effect associated with the authentic context and boundary binding.
 
 #### 2.3.2 Lifecycle boundary
 
