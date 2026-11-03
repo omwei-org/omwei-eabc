@@ -28,7 +28,7 @@ The Required Boundary Properties are assessed relative to an explicitly declared
 
 A Protected Effect Scope MUST be sufficiently specific to determine which execution paths are relevant to the conformance claim. The scope MAY cover one protected effect, a defined class of effects, or a bounded set of resources and transitions. A claim MUST NOT be interpreted as global beyond the scope declared by the applicable contract and threat model.
 
-For the purposes of Complete Mediation and the EBP properties of Exclusivity and Non-bypass, the assessment scope is further represented as a **Path Scope**:
+For the purposes of Complete Mediation and the EBP path requirements, including the legacy term `EBP-006:Exclusivity@v1` and the separately named Non-bypass requirement, the assessment scope is further represented as a **Path Scope**:
 
 - **Protected Effect Scope** — what externally observable consequence is protected.
 - **Path Scope** — the set of in-scope execution paths that are capable of producing that protected effect under the declared threat model.
@@ -46,14 +46,31 @@ Protected Effect Scope
 Complete Mediation (Core P2)
         │
         ▼
-Exclusivity / Non-bypass (EBP)
+`EBP-006:Exclusivity@v1` / Non-bypass (EBP legacy path requirements)
 ```
 
-**Complete Mediation** is the Core property that every in-scope path capable of producing the protected effect is subject to the applicable authority boundary. EBP's **Exclusivity** and **Non-bypass** properties establish the corresponding boundary-level deployment claim: there is no in-scope alternative path through which the protected effect can occur outside that boundary.
+**Complete Mediation** is the Core property that every in-scope path capable of producing the protected effect is subject to the applicable authority boundary. The legacy EBP-006 requirement `EBP-006:Exclusivity@v1` and the separately named **Non-bypass** requirement establish the corresponding boundary-level deployment claim: there is no in-scope alternative path through which the protected effect can occur outside that boundary.
 
-Exclusivity and Non-bypass are therefore not additional replacements for Core Property 2. They are boundary-conformance properties used to substantiate the stronger claim that the deployment topology actually supports complete mediation for the declared scope.
+`EBP-006:Exclusivity@v1` and Non-bypass are therefore not additional replacements for Core Property 2. They are boundary-conformance properties used to substantiate the stronger claim that the deployment topology actually supports complete mediation for the declared scope.
 
 ### 2.2 Threat Model and Scope of a Non-bypass Claim
+
+#### Legacy EBP-006 terminology migration (EABC-ADR-R1 §6)
+
+The historical EBP-006 term **Exclusivity**, when used to mean the absence of an in-scope execution path to the Protected Effect that bypasses the boundary, is identified by the versioned legacy identifier:
+
+`EBP-006:Exclusivity@v1`
+
+Its semantic migration mapping is:
+
+`EBP-006:Exclusivity@v1` → `NON_BYPASSABILITY`
+
+This mapping preserves the original path-exclusion meaning. It concerns execution paths capable of producing the Protected Effect and whether those paths are mediated by the boundary. It does **not** concern the existence or absence of independent or parallel Commit Authorities.
+
+This is a terminology/reference migration only. It does not retroactively rewrite the historical EBP-006 text, and it does not define or introduce the future authority-based EABC property `EXCLUSIVITY(A,E,I)`. That property is not specified or made normative by this document.
+
+The separately named **Non-bypass** requirement below is retained with its original negative-topology formulation and its distinct evidence rationale. This migration does not remove or weaken either EBP evidence expectation.
+
 
 A non-bypass claim MUST state the threat model and scope under which it is assessed.
 
@@ -70,13 +87,13 @@ The phrase **non-bypassable** MUST NOT be interpreted as an unconditional claim 
 
 If a relevant path is outside the declared threat model or cannot be bounded by the assessment method, that limitation MUST be explicit in the conformance evidence. It MUST NOT be silently treated as evidence that the path is absent.
 
-This scope discipline also prevents a fresh implementation attestation or an implementation identity claim from being used as a substitute for path/exclusivity evidence. As stated in §4.1, **Fresh Attestation ≠ Non-bypass** and **Implementation Identity ≠ Execution Boundary Exclusivity**.
+This scope discipline also prevents a fresh implementation attestation or an implementation identity claim from being used as a substitute for path/exclusivity evidence. As stated in §4.1, **Fresh Attestation ≠ Non-bypass** and **Implementation Identity ≠ `EBP-006:Exclusivity@v1`**.
 
 The initial property set:
 
 - **Independence** — the boundary's admit/refuse decision is not controllable by the party whose action is being evaluated.
-- **Exclusivity** — no path to the protected effect exists that bypasses this boundary.
-- **Non-bypass** — same as Exclusivity, stated as a negative requirement on the deployment topology rather than a positive requirement on the boundary itself; kept as a distinct named property because the two are demonstrated by different evidence (topology audit vs. boundary behavior).
+- **`EBP-006:Exclusivity@v1` (legacy Exclusivity)** — no path to the protected effect exists that bypasses this boundary; this is a path-coverage requirement, not a statement about independent Commit Authorities.
+- **Non-bypass** — same no-bypass-path condition as `EBP-006:Exclusivity@v1`, stated as a negative requirement on the deployment topology rather than a positive requirement on the boundary itself; retained as a distinct named EBP requirement because the two are demonstrated by different evidence (topology audit vs. boundary behavior).
 - **Physical non-extractability** — where the boundary's own state or keys are the thing being protected, they cannot be extracted or replayed at the layer being assessed.
 - **Isolation** — the boundary's execution is not observable-or-influenceable by co-located, non-boundary processes.
 - **Renderer integrity** — where the boundary emits evidence or a claim-set for consumption by another system, the emitting logic itself has not been altered from its assessed form.
@@ -133,7 +150,7 @@ This mirrors the same shape used elsewhere in the architecture for POISON-overri
 
 ### 3.3 Availability is explicitly out of scope for semantics
 
-A deployment MAY use caching, redundancy, or staged rollout to reduce how often `INDETERMINATE` is observed in practice. It MUST NOT use these mechanisms to change what `INDETERMINATE` *means*. This document does not resolve the pre-existing Exclusivity-vs-Availability ("blast radius") tension tracked in `[[sif-slc-architecture]]`; EBP states the requirement, availability engineering remains a deployment/SIF concern.
+A deployment MAY use caching, redundancy, or staged rollout to reduce how often `INDETERMINATE` is observed in practice. It MUST NOT use these mechanisms to change what `INDETERMINATE` *means*. This document does not resolve the pre-existing `EBP-006:Exclusivity@v1`-vs-Availability ("blast radius") tension tracked in `[[sif-slc-architecture]]`; EBP states the requirement, availability engineering remains a deployment/SIF concern.
 
 ## 4. Conformance Attestation
 
@@ -151,7 +168,7 @@ These three are independent dimensions and MUST be evidenced independently (same
 
 - `valid_until` alone does not prove that the *currently running* instance is the one that was attested. A binding mechanism between attestation and running instance is required wherever instance identity is structurally load-bearing for a claimed property — but EBP does not mandate *which* binding mechanism (static/deployment-time, challenge-response, or continuously-maintained trusted state); that choice is implementation/profile-dependent.
 - **Fresh Attestation ≠ Non-bypass.** A freshly and validly attested instance can still sit behind a bypassable deployment topology. These are separate properties (§2) and require separate evidence; neither substitutes for the other.
-- **Implementation Identity ≠ Execution Boundary Exclusivity.** Knowing precisely which software/hardware is running (identity) does not by itself establish that no other path to the effect exists (exclusivity). Kept as separate properties for the same reason.
+- **Implementation Identity ≠ Execution Boundary Exclusivity.** Knowing precisely which software/hardware is running (identity) does not by itself establish that no other path to the effect exists. Implementation identity and the legacy path-exclusion requirement require separate evidence.
 
 ## 5. Conformance Evidence (a new, instance-scoped evidence class)
 
