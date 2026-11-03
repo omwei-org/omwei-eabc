@@ -882,7 +882,7 @@ A1 resolves the following outstanding questions:
 
 - the normative scope and meaning of all three integrity properties;
 - the choice between prevention and detection-before-decision-impact for `INTEGRITY_DEF`, and the threat-model binding of the prevention claim;
-- the distinction between runtime state and execution context, and the preservation of the full scope of P5 within `INTEGRITY_STATE`;
+- the distinction between runtime state and execution context, and the preservation of the first P5 obligation through `INTEGRITY_STATE(B,E)` together with the independent preservation of the consumer-facing execution-state correspondence obligation;
 - the allowance for a datum to have multiple normative roles where the architecture genuinely uses it in multiple ways;
 - the separation of state authenticity and freshness;
 - the bounded lifecycle of the context-to-boundary-to-effect binding;
