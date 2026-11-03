@@ -287,7 +287,7 @@ The two claims are related but distinct. Evidence establishing `INTEGRITY_STATE(
 
 The original P5 consumer-facing obligation MUST remain in force after migration to the five boundary semantic properties. It MUST be assessed in its own normative meaning. This clarification does not prescribe a particular evidence format, mechanism, or implementation architecture.
 
-### 2.3 INTEGRITY_CTX(C,B,E) — Context-to-Boundary-to-Effect Binding Integrity
+### 2.3 INTEGRITY_CTX(C,B,E) — Context Authenticity and Context-to-Boundary-to-Effect Binding Integrity
 
 #### 2.3.1 Normative subject and definition
 
@@ -362,7 +362,7 @@ The three integrity properties have distinct normative subjects.
 | --- | --- | --- | --- |
 | `INTEGRITY_DEF(B)` | Boundary definition | Is this the authentic definition applicable to the deciding boundary instance? | Runtime state integrity |
 | `INTEGRITY_STATE(B,E)` | Runtime state evaluated by B | Is the state used for the determination authentic and correctly bound to it? | Freshness by itself |
-| `INTEGRITY_CTX(C,B,E)` | Context/boundary/effect binding | Is the binding authentic and maintained through the associated effect? | P3 check-to-effect atomicity |
+| `INTEGRITY_CTX(C,B,E)` | Context authenticity and context/boundary/effect binding | Are the relevant context elements authentic, and is their binding to B and E authentic and maintained through the associated effect? | P3 check-to-effect atomicity |
 
 These properties MUST NOT be treated as interchangeable or inferred from one another.
 
@@ -856,7 +856,7 @@ In particular:
 
 - `NON_BYPASSABILITY(B,E)` does not automatically establish all of P2;
 - `INTEGRITY_CTX(C,B,E)` does not automatically establish all of P4;
-- `INTEGRITY_STATE(B,E)` does not automatically establish all of P5, in particular the independent consumer-facing obligation to determine whether execution occurred against the intended state;
+- `INTEGRITY_STATE(B,E)` does not automatically establish all of P5, in particular the independent consumer-facing obligation to determine whether execution corresponded to the intended reference state or condition under the applicable authorization and execution semantics;
 - evidence establishing the authenticity and determination-binding of the state evaluated by B does not, by itself, establish that execution corresponded to the intended reference state or condition designated by the applicable authorization and execution semantics;
 - a boundary property does not automatically establish P6 or P7;
 - P6 or P7 evidence does not automatically establish a boundary semantic property.
