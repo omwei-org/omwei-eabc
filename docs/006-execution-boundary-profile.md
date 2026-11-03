@@ -168,7 +168,7 @@ These three are independent dimensions and MUST be evidenced independently (same
 
 - `valid_until` alone does not prove that the *currently running* instance is the one that was attested. A binding mechanism between attestation and running instance is required wherever instance identity is structurally load-bearing for a claimed property — but EBP does not mandate *which* binding mechanism (static/deployment-time, challenge-response, or continuously-maintained trusted state); that choice is implementation/profile-dependent.
 - **Fresh Attestation ≠ Non-bypass.** A freshly and validly attested instance can still sit behind a bypassable deployment topology. These are separate properties (§2) and require separate evidence; neither substitutes for the other.
-- **Implementation Identity ≠ Execution Boundary Exclusivity.** Knowing precisely which software/hardware is running (identity) does not by itself establish that no other path to the effect exists. Implementation identity and the legacy path-exclusion requirement require separate evidence.
+- **Implementation Identity ≠ `EBP-006:Exclusivity@v1`.** Knowing precisely which software/hardware is running (identity) does not by itself establish that no other path to the effect exists. Implementation identity and the legacy path-exclusion requirement require separate evidence.
 
 ## 5. Conformance Evidence (a new, instance-scoped evidence class)
 
