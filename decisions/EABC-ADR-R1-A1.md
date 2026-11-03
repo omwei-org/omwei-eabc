@@ -827,7 +827,7 @@ The following reconciliation preserves the treatment adopted by ADR R1 and clari
 | P2 — Complete Mediation | Refined | Preserve P2 as an original EABC obligation. Refine its boundary-level path-mediation assessment through `NON_BYPASSABILITY(B,E)`, supported by topology-completeness and boundary-mediation evidence. |
 | P3 — Deterministic Commit Semantics | Retained and clarified | Preserve explicit deterministic transition semantics and check-to-effect atomicity. `TEMPORAL_CONSISTENCY` and `MAX_ENFORCEMENT_LATENCY` remain separate EBP assurance constraints. |
 | P4 — Context Binding | Refined | Preserve the original context-binding obligation and refine the boundary semantic treatment through `INTEGRITY_CTX(C,B,E)`. P4 is not replaced by the new property. |
-| P5 — State Binding | Refined; both original obligations preserved | `INTEGRITY_STATE(B,E)` refines the obligation to identify the state against which authorization was evaluated. Independently preserve the consumer-facing obligation that consumers MUST be able to determine whether execution occurred against the intended state. Evidence for `INTEGRITY_STATE(B,E)` does not automatically establish execution-state correspondence. Authenticity does not imply freshness. |
+| P5 — State Binding | Refined; both original obligations preserved | `INTEGRITY_STATE(B,E)` refines the obligation to identify the state against which authorization was evaluated. Independently preserve the consumer-facing obligation that consumers MUST be able to determine whether execution corresponded to the intended reference state or condition designated by the applicable authorization and execution semantics, including any expressly permitted state evolution. Evidence for `INTEGRITY_STATE(B,E)` does not automatically establish execution-state correspondence. Authenticity does not imply freshness. |
 | P6 — Evidence Integrity | Retained | Preserve evidence-artifact integrity as a distinct EABC evidence obligation. It is not replaced by `INTEGRITY_DEF`, `INTEGRITY_STATE`, or `INTEGRITY_CTX`. |
 | P7 — Evidence Correlation | Retained | Preserve evidence correlation and the intrinsically bound principle as distinct EABC evidence obligations. They are not replaced by `INTEGRITY_CTX`. |
 | P8 — Failure Semantics | Retained and clarified | Preserve explicit failure semantics and the distinction between missing evidence and success. `FAIL_CLOSED` remains a profile-level guarantee refinement, not a universal replacement. |
@@ -851,7 +851,7 @@ In particular:
 - `NON_BYPASSABILITY(B,E)` does not automatically establish all of P2;
 - `INTEGRITY_CTX(C,B,E)` does not automatically establish all of P4;
 - `INTEGRITY_STATE(B,E)` does not automatically establish all of P5, in particular the independent consumer-facing obligation to determine whether execution occurred against the intended state;
-- evidence establishing the authenticity and determination-binding of the state evaluated by B does not, by itself, establish that execution occurred against the intended state;
+- evidence establishing the authenticity and determination-binding of the state evaluated by B does not, by itself, establish that execution corresponded to the intended reference state or condition designated by the applicable authorization and execution semantics;
 - a boundary property does not automatically establish P6 or P7;
 - P6 or P7 evidence does not automatically establish a boundary semantic property.
 
@@ -885,6 +885,7 @@ A1 resolves the following outstanding questions:
 - the distinction between runtime state and execution context, and the preservation of the first P5 obligation through `INTEGRITY_STATE(B,E)` together with the independent preservation of the consumer-facing execution-state correspondence obligation;
 - the allowance for a datum to have multiple normative roles where the architecture genuinely uses it in multiple ways;
 - the separation of state authenticity and freshness;
+- the authenticity and provenance requirements for context elements, as distinct from the authenticity of the context-to-boundary-to-effect binding;
 - the bounded lifecycle of the context-to-boundary-to-effect binding;
 - the distinction between `INTEGRITY_CTX` and P3 check-to-effect atomicity;
 - the distinction between the three integrity properties and P6/P7;
@@ -935,8 +936,8 @@ A1 does not authorize implementation of EABC 001–004 by itself. No normative m
 The EABC Specification Authority is asked to approve or reject the following proposed decisions. The register IDs refer to Annex A.
 
 1. Adoption of Option A — Prevention — for `INTEGRITY_DEF(B)`, with the threat-model binding, rather than Option B — Detection before decision impact, and the instance binding of the definition (A1-D01, A1-D02).
-2. The normative definition of `INTEGRITY_STATE(B,E)`, including the preservation of the first original P5 obligation, the independent preservation of the consumer-facing obligation to determine whether execution occurred against the intended state, the explicit separation of runtime state from execution context, and the separation of freshness (A1-D03, A1-D06, A1-D21).
-3. The normative definition and bounded lifecycle of `INTEGRITY_CTX(C,B,E)`, including the rule for data with multiple normative roles (A1-D04, A1-D05).
+2. The normative definition of `INTEGRITY_STATE(B,E)`, including the preservation of the first original P5 obligation, the independent consumer-facing obligation to determine correspondence with the intended reference state or condition under the applicable authorization and execution semantics, the explicit separation of runtime state from execution context, and the separation of freshness (A1-D03, A1-D06, A1-D21).
+3. The normative definition and bounded lifecycle of `INTEGRITY_CTX(C,B,E)`, including context-source authenticity and provenance and the rule for data with multiple normative roles (A1-D04, A1-D05).
 4. The cross-property separation of the three integrity properties from P6 and P7 (A1-D07).
 5. Mandatory assessment of all five boundary semantic properties for full Level 1 conformance (A1-D08).
 6. The N/A restrictions and acceptance procedure in §3.3, including the treatment of C = ∅ and self-accepted N/A (A1-D09, A1-D10, A1-D11, A1-D12).
@@ -965,7 +966,7 @@ All decisions below are proposals requiring explicit EABC Specification Authorit
 | A1-D01 | INTEGRITY_DEF guarantee | A: prevent unauthorized modification/substitution. B: permit modification but detect and reject before decision impact. | A — Prevention, assessed against a declared threat model bound to the definition scope and boundary instance. B is weaker and not equivalent. |
 | A1-D02 | Definition authenticity and instance binding | Artifact-only integrity; or authentic definition plus demonstrable binding to the deciding boundary instance. | Authentic identity, scope, enforcement-relevant content, and instance binding. |
 | A1-D03 | INTEGRITY_STATE subject and first P5 obligation | Narrow state of B only; or all runtime state B evaluates or relies on. | Runtime state evaluated by B, covering operational state of B, relevant condition of the governed system/target, and policy/configuration/delegated-authority state or version values; authentic and bound to the determination. This refines the first P5 obligation only; it does not by itself establish the separate consumer-facing execution-state correspondence obligation. |
-| A1-D04 | STATE/CTX overlap | Force every datum into one category; or allow multiple genuine normative roles. | Allow multiple roles, but identify and assess each role independently. |
+| A1-D04 | STATE/CTX overlap and context provenance | Force every datum into one category; or allow multiple genuine normative roles while preserving context provenance. | Allow multiple roles, but identify and assess each role independently; establish the authenticity and provenance of context elements under the declared authoritative-source and derivation rules. |
 | A1-D05 | INTEGRITY_CTX lifecycle | Unbounded lifecycle; or bounded determination-to-effect interval. | Bounded interval from determination through associated effect, with explicit invalidation conditions. |
 | A1-D06 | Freshness | Include freshness in STATE; or treat it separately. | Freshness remains separate from INTEGRITY_STATE. |
 | A1-D07 | Integrity properties vs P6/P7 | Merge into evidence integrity/correlation; or preserve separate semantic subjects. | Preserve separate boundary semantic and evidence obligations. |
@@ -982,7 +983,7 @@ All decisions below are proposals requiring explicit EABC Specification Authorit
 | A1-D18 | P1 bypass | Retain a duplicate bypass clause; or map it to NON_BYPASSABILITY. | Map bypass to NON_BYPASSABILITY with the stated justification; do not retain a duplicate P1 property. |
 | A1-D19 | P2 evidence | Treat topology completeness and mediation as one undifferentiated item; or preserve two necessary dimensions. | Require both deployment-topology completeness and boundary mediation. |
 | A1-D20 | P3 and assurance constraints | Treat temporal assurance constraints as replacements; or preserve P3 semantics. | Preserve P3 check-to-effect atomicity; keep TEMPORAL_CONSISTENCY and MAX_ENFORCEMENT_LATENCY in EBP. |
-| A1-D21 | P1–P10 reconciliation and P5 preservation | Replace original properties; or map without loss or duplication. | Preserve P1–P10 and explicitly map the five boundary properties. For P5, retain both original obligations: identification of the state against which authorization was evaluated, refined through `INTEGRITY_STATE(B,E)`, and the independent consumer-facing obligation to determine whether execution occurred against the intended state. Neither claim automatically establishes the other. |
+| A1-D21 | P1–P10 reconciliation and P5 preservation | Replace original properties; or map without loss or duplication. | Preserve P1–P10 and explicitly map the five boundary properties. For P5, retain both original obligations: identification of the state against which authorization was evaluated, refined through `INTEGRITY_STATE(B,E)`, and the independent consumer-facing obligation to determine whether execution corresponded to the intended reference state or condition designated by the applicable authorization and execution semantics, including any expressly permitted state evolution. Neither claim automatically establishes the other. |
 | A1-D22 | Migration sequence | Migrate immediately; or wait for separate A1 acceptance. | Accept A1 first, then prepare one coordinated 001–004 migration PR. |
 | A1-D23 | EXCLUSIVITY assessment requirements | Leave EXCLUSIVITY without assessment rules; or require reference-authority designation, candidate inventory with completeness method, conditioning relationships, and no new authority type for mutual conditioning. | Require the §2.6 assessment requirements; do not introduce a new entity type for mutually conditioned determinations. |
 
