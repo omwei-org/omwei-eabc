@@ -23,4 +23,4 @@ A decision record SHOULD identify:
 ## Current Decisions
 
 - [EABC-ADR-R1 — Adoption of the Five-Element EABC Boundary Semantic Set and Migration of Existing Property Semantics](./EABC-ADR-R1.md) — adopted decision; normative migration is handled separately through subsequent pull requests.
-- [EABC-ADR-R1-A1 — Normative Clarifications and P1–P10 Reconciliation](./EABC-ADR-R1-A1.md) — proposed authority decision record; pending EABC Specification Authority review.
+- [EABC-ADR-R1-A1 — Normative Clarifications and P1–P10 Reconciliation](./EABC-ADR-R1-A1.md) — approved; review closed. See [the A1 acceptance record](./EABC-ADR-R1-A1-ACCEPTANCE.md).
