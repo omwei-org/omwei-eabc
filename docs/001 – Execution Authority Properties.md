@@ -348,6 +348,8 @@ Where A′'s determination is not conditioned on A's determination, A′ satisfi
 
 Where determinations are mutually conditioned, the assessment SHALL record the mutual conditioning relationship and describe the rule by which the combined determination is formed. It MUST NOT classify either determination as a Parallel Commit Authority solely on the basis of that mutual conditioning. Whether the resulting arrangement constitutes a single operative Commit Authority or another authority structure MUST be assessed under the existing definition in ADR R1 §2. Failure to form a determination (for example, deadlock) is governed by P8 failure semantics and is not, by itself, a violation of this property.
 
+This requirement does not introduce a new authority entity type for mutually conditioned determinations.
+
 As with `NON_BYPASSABILITY(B,E)`, an inventory without a stated completeness method does not support the claim.
 
 ## 1.6 Separation among the five properties and P6/P7
