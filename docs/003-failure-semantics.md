@@ -128,20 +128,22 @@ Execution outcomes do not imply successful authorization.
 
 # P3 Check-to-Effect Atomicity
 
-P3 — Deterministic Commit Semantics — remains an EABC semantic obligation. Its scope includes:
+P3 remains an EABC semantic obligation.
+
+Its scope includes:
 
 - explicit representation of the transition between authorization and execution;
 - deterministic interpretation of the transition outcome;
-- preservation of the distinction between authorization, attempted execution, committed effect, and execution failure; and
-- check-to-effect atomicity: the absence of a gap between the decision and the effect it authorizes.
+- preservation of the distinction between authorization, attempted execution, committed effect, and execution failure;
+- check-to-effect atomicity, meaning the absence of a gap between the decision and the effect it authorizes.
 
-The boundary MUST ensure that the conditions on which a determination to permit E relies remain valid through the associated effect, or that a change which invalidates those conditions prevents the effect until a new determination or expressly authorized revalidation has occurred. The applicable semantics MUST make the relevant check, commit, and effect relationship identifiable and verifiable.
+The current EABC 003 statement that atomicity of an authorization/commit transition does not by itself establish atomicity between COMMIT and a subsequent external EFFECT remains valid.
 
-Where COMMIT and a subsequent external EFFECT are distinct stages, atomicity of an authorization/commit transition does not by itself establish check-to-effect atomicity. The execution-boundary semantics MUST establish the required relationship across the entire interval from the operative determination to the associated effect. A gap caused by a state change, authority revocation, context change, or other relevant condition is within P3 even where the context-to-boundary-to-effect binding itself remains authentic.
+Where COMMIT and a subsequent external EFFECT are distinct stages, the execution-boundary semantics MUST establish the check-to-effect atomicity required by P3.
 
-`INTEGRITY_CTX(C,B,E)` establishes authenticity and continuity of the context/boundary/effect binding. It does not establish P3 check-to-effect atomicity. A context binding can remain authentic while a state change or revocation creates a check-to-effect gap. Conversely, an atomic transition can still be bound to the wrong context or effect. The two obligations MUST be assessed separately.
+`INTEGRITY_CTX(C,B,E)` does not establish P3 check-to-effect atomicity. A context binding can remain authentic while a gap between the decision and the effect occurs. Conversely, an atomic transition can still be bound to the wrong context or effect. The two obligations MUST be assessed separately.
 
-`TEMPORAL_CONSISTENCY` and `MAX_ENFORCEMENT_LATENCY` remain EBP assurance constraints. They may qualify the assurance of an implementation's P3 satisfaction but MUST NOT replace, redefine, or discharge the EABC semantic obligation.
+`TEMPORAL_CONSISTENCY` and `MAX_ENFORCEMENT_LATENCY` remain EBP assurance constraints. They may qualify assurance of an implementation's P3 satisfaction but MUST NOT replace or redefine P3.
 
 This clarification does not introduce a new verification primitive. The existing `FINAL_AUTHORITY_CHECK` and `COMMIT_CONDITIONS` remain distinct commit-time gates.
 
@@ -160,7 +162,7 @@ even if both originate from the same event.
 
 Atomic implementations MUST NOT obscure either semantic.
 
-P3 check-to-effect atomicity remains required where COMMIT and the subsequent external EFFECT are distinct stages. The execution-boundary semantics MUST establish that the decision remains applicable through the associated effect, as specified in the preceding P3 section.
+The execution-boundary semantics MUST establish the check-to-effect atomicity required by P3 where COMMIT and the subsequent external EFFECT are distinct stages.
 
 ---
 
