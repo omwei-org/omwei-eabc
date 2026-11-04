@@ -23,3 +23,4 @@ A decision record SHOULD identify:
 ## Current Decisions
 
 - [EABC-ADR-R1 — Adoption of the Five-Element EABC Boundary Semantic Set and Migration of Existing Property Semantics](./EABC-ADR-R1.md) — adopted decision; normative migration is handled separately through subsequent pull requests.
+- [EABC-ADR-R1-A1 — Normative Clarifications and P1–P10 Reconciliation](./EABC-ADR-R1-A1.md) — accepted by the authority response in §7.3, covering A1-D01 through A1-D23 and Annex B.1–B.3 at proposal baseline `f44655d5d061f61658a7dc4503f5d3183af77430`. See the [supplementary acceptance index](./EABC-ADR-R1-A1-ACCEPTANCE.md). Its original agent prompt is preserved in [the prompt archive](../archive/prompts/EABC-ADR-R1-A1-original-agent-prompt.md).
