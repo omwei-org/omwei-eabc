@@ -16,6 +16,23 @@ EABC remains accountable to the architectural principles and operationalization 
 
 EABC describes observable guarantees, not a mandatory implementation architecture, substrate, protocol, storage mechanism, or cryptographic construction.
 
+The original P1–P10 obligations retain their established relationship to the Execution Authority whitepaper:
+
+| EABC obligation | Origin |
+|---|---|
+| P1 — Independent Execution Authority | Whitepaper Section 3 — Independence |
+| P2 — Complete Mediation | Whitepaper Section 3 — Complete Mediation |
+| P3 — Deterministic Commit Semantics | Whitepaper Section 3 — Determinism and Commit Control |
+| P4 — Context Binding | Whitepaper Section 3 — State/Context Binding (context component), operationalized through the ACT `context` and `constraints` fields |
+| P5 — State Binding | Whitepaper Section 3 — State/Context Binding (state component), operationalized through the ACT `validity` field and EAtt `execution_context` |
+| P6 — Evidence Integrity | Operationalization layer — EAtt `integrity` field |
+| P7 — Evidence Correlation | Operationalization layer — EAtt causal binding to ACT_hash |
+| P8 — Failure Semantics | Operationalization layer — Verification Outcome and EAtt `result` field |
+| P9 — Implementation Neutrality | Whitepaper Section 5.4 — Technology Neutrality |
+| P10 — Extensible Profiles | EABC-specific; realizes the expectation in Whitepaper Section 12.4 that implementation-level questions be resolved by a downstream specification |
+
+This mapping preserves the original distinction between the whitepaper's theoretical properties and its operationalization layer. The five boundary semantic properties are an additional EABC normative layer adopted by ADR R1 and clarified by A1; they do not replace or renumber P1–P10.
+
 ---
 
 # 1. Five boundary semantic properties
@@ -571,6 +588,23 @@ It remains part of the broader P1 requirement that the governed entity cannot mo
 
 It is also distinct from `INTEGRITY_DEF(B)`: the latter protects the definition governing the boundary instance, while this P1 sub-obligation protects the established execution authority and its operative rights.
 
+### Original P1 rationale
+
+A system cannot independently authorize actions that it is also free to modify.
+
+Separation of execution authority establishes an independently verifiable trust boundary.
+
+This property operationalizes the whitepaper's Independence axiom: ¬Control(A_D, EB) (Section 3.2.2).
+
+### Original P1 evidence guidance
+
+An implementation SHOULD provide evidence demonstrating:
+
+* authority origin
+* trust-domain identity
+* authority integrity
+* authority authenticity
+
 ## P2 — Complete Mediation
 
 Every externally committed action MUST pass through the execution-authority boundary.
@@ -578,6 +612,23 @@ Every externally committed action MUST pass through the execution-authority boun
 No execution path capable of producing externally observable effects may bypass evaluation by the execution-authority system.
 
 P2 remains an original EABC obligation. `NON_BYPASSABILITY(B,E)` refines the boundary-level path-mediation assessment and requires both deployment-topology completeness and boundary mediation. A `NON_BYPASSABILITY` claim does not automatically establish all of P2. The conformance assessment MUST preserve and assess P2's full scope separately.
+
+### Original P2 rationale
+
+Partial mediation creates execution paths that cannot be governed.
+
+The contract therefore assumes that every committed action is mediated.
+
+This property operationalizes the whitepaper's Complete Mediation axiom (Section 3.2.1).
+
+### Original P2 evidence guidance
+
+Implementations SHOULD demonstrate:
+
+* mediation identifier
+* decision correlation
+* execution correlation
+* audit continuity
 
 ## P3 — Deterministic Commit Semantics
 
@@ -665,6 +716,29 @@ In particular:
 
 The assessment MUST identify the requirement supported by each item of evidence and the claim that the evidence establishes. Shared evidence MUST NOT be treated as a reason to collapse distinct requirements.
 
+### Original P3 rationale
+
+Consumers must be able to distinguish:
+
+* authorization granted
+* authorization denied
+* execution attempted
+* execution committed
+* execution failed
+
+without ambiguity.
+
+This property operationalizes the whitepaper's Determinism and Commit Control properties (Section 3), which govern the atomic validated-to-committed transition referenced in the EAtt `commit_event` field (Section 9.3).
+
+### Original P3 evidence guidance
+
+Implementations SHOULD expose:
+
+* commit decision
+* execution outcome
+* execution status
+* failure reason
+
 ## P4 — Context Binding
 
 Execution authority MUST be cryptographically or otherwise integrity-bound to the execution context for which it was issued.
@@ -672,6 +746,22 @@ Execution authority MUST be cryptographically or otherwise integrity-bound to th
 Execution authority MUST NOT be reusable outside its intended scope.
 
 `INTEGRITY_CTX(C,B,E)` refines the boundary semantic treatment of context authenticity and the context-to-boundary-to-effect binding. It does not replace all of P4. P4 MUST be assessed in its full original meaning, and evidence for `INTEGRITY_CTX(C,B,E)` does not automatically establish all of P4.
+
+### Original P4 rationale
+
+Execution authority without context binding can be replayed or misapplied.
+
+This property operationalizes the context component of the whitepaper's State/Context Binding property (Section 3), corresponding to the `constraints` and `context` fields of the Authorization Artifact (Section 8.3).
+
+### Original P4 evidence guidance
+
+Examples include:
+
+* workload identity
+* target resource
+* execution context
+* validity interval
+* execution constraints
 
 ## P5 — State Binding
 
@@ -683,6 +773,22 @@ The original P5 requirement contains two distinct obligations:
 
 The first obligation is refined through `INTEGRITY_STATE(B,E)`. The second remains independently applicable and MUST be assessed in its own consumer-facing meaning. Its complete normative clarification is reproduced verbatim as §2.2.6 under §1.3 above.
 
+### Original P5 rationale
+
+Authorization decisions are meaningful only within the state in which they were evaluated.
+
+This property operationalizes the state component of the whitepaper's State/Context Binding property (Section 3), corresponding to the `validity` field of the Authorization Artifact and the `execution_context` field of the Execution Attestation (Sections 8.3, 9.3).
+
+### Original P5 evidence guidance
+
+Typical evidence includes:
+
+* policy version
+* configuration version
+* delegated authority version
+* decision-record hash
+* state hash
+
 ## P6 — Evidence Integrity
 
 Execution-authority evidence MUST be tamper evident.
@@ -690,6 +796,21 @@ Execution-authority evidence MUST be tamper evident.
 Consumers MUST be able to determine whether evidence has been modified.
 
 P6 concerns evidence artifacts. It is not replaced by `INTEGRITY_DEF(B)`, `INTEGRITY_STATE(B,E)`, or `INTEGRITY_CTX(C,B,E)`.
+
+### Original P6 rationale
+
+Execution authority depends on trustworthy evidence rather than trust in implementation.
+
+This property operationalizes the `integrity` field of the whitepaper's Execution Attestation (Section 9.3); it belongs to the whitepaper's operationalization layer rather than to the Section 3 theoretical properties.
+
+### Original P6 evidence guidance
+
+Examples include:
+
+* digital signatures
+* integrity hashes
+* immutable audit records
+* authenticated event chains
 
 ## P7 — Evidence Correlation
 
@@ -699,6 +820,21 @@ Consumers MUST be able to reconstruct the execution-authority chain.
 
 P7 remains a distinct evidence obligation. Intrinsic integrity protection of correlation references is specified in 002 — Evidence Model. `INTEGRITY_CTX(C,B,E)` does not replace P7.
 
+### Original P7 rationale
+
+Independent verification requires continuity across architectural layers.
+
+This property operationalizes the causal binding EAtt ⇒ (ACT + EA + CommitEvent) defined in the whitepaper (Section 9.4), and is a precondition for the Artefact Chain Integrity requirement discussed in the whitepaper's Section 12.1.
+
+### Original P7 evidence guidance
+
+Typical correlation includes:
+
+* lifecycle identifier
+* correlation identifier
+* execution identifier
+* decision identifier
+
 ## P8 — Failure Semantics
 
 Failure conditions MUST be explicitly represented.
@@ -707,11 +843,38 @@ Missing evidence SHALL NOT be interpreted as successful execution.
 
 Consumers must be able to distinguish denied, failed, cancelled, expired, unavailable, and unknown outcomes as applicable. `FAIL_CLOSED` is a profile-level guarantee refinement, not a universal replacement for P8.
 
+### Original P8 rationale
+
+Consumers must distinguish between:
+
+* denied
+* failed
+* cancelled
+* expired
+* unavailable
+* unknown
+
+This property operationalizes the `result` field of the Execution Attestation and the possible verification outcomes described in the whitepaper's Verification Model (Sections 9.3, 10.5); the whitepaper leaves the specific outcome vocabulary open, which EABC's companion document **003 – Failure and Execution Semantics** resolves.
+
+### Original P8 evidence guidance
+
+Implementations SHOULD provide explicit terminal states.
+
 ## P9 — Implementation Neutrality
 
 The execution-authority contract MUST describe observable properties rather than implementation mechanisms.
 
 Conformance is determined by demonstrated properties, not implementation similarity. No boundary property mandates a particular substrate or architecture.
+
+### Original P9 rationale
+
+Multiple independent architectures should be capable of satisfying the same contract.
+
+Conformance is determined by demonstrated properties, not implementation similarity.
+
+This property operationalizes the whitepaper's Technology Neutrality principle (Section 5.4): required boundary strength is a function of protected consequences, not of implementation technology.
+
+---
 
 ## P10 — Extensible Profiles
 
@@ -720,6 +883,14 @@ Concrete implementations SHALL define implementation profiles mapping their inte
 Implementation profiles MUST NOT redefine normative EABC properties.
 
 P10 preserves the distinction between an EABC Implementation Profile, which maps a concrete implementation to EABC requirements, and an EAP Profile. These are not interchangeable profile types.
+
+---
+
+### Original P10 rationale
+
+The contract remains stable while implementations evolve independently.
+
+This property has no direct whitepaper counterpart; it realizes, at the specification layer, the whitepaper's Section 12.4 expectation that concrete data formats, protocols, and implementation-level questions be resolved by a downstream Specification rather than by the theory itself.
 
 ---
 
