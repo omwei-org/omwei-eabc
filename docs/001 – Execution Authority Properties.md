@@ -141,17 +141,6 @@ The existence of an update mechanism does not itself establish that an update is
 
 A signature, hash, or authenticated configuration artifact MAY contribute evidence, but none is sufficient by itself to establish `INTEGRITY_DEF(B)`. The assessment must also establish that the authentic definition is the one applicable to the boundary instance making the determination.
 
-#### 2.1.5 Distinction from other requirements
-
-`INTEGRITY_DEF(B)` does not establish:
-
-- the integrity or authenticity of runtime state used for a particular determination; that is `INTEGRITY_STATE(B,E)`;
-- the integrity of the context-to-boundary-to-effect binding; that is `INTEGRITY_CTX(C,B,E)`;
-- the integrity of evidence artifacts generally; that remains P6, Evidence Integrity;
-- the absence of an execution path that bypasses B; that is `NON_BYPASSABILITY(B,E)`;
-- the absence of a Parallel Commit Authority; that is `EXCLUSIVITY(A,E,I)`.
-
-A signature, hash, or authenticated configuration artifact MAY contribute evidence, but none is sufficient by itself to establish `INTEGRITY_DEF(B)`. The assessment must also establish that the authentic definition is the one applicable to the boundary instance making the determination.
 
 ## 1.3 INTEGRITY_STATE(B,E)
 
