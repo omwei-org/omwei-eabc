@@ -4,15 +4,15 @@
 **Title:** Normative Clarifications and P1–P10 Reconciliation
 **Parent Decision:** EABC-ADR-R1
 **Authority:** EABC Specification Authority
-**Status:** PROPOSED
-**Outcome:** PENDING AUTHORITY REVIEW
+**Status:** ACCEPTED
+**Outcome:** ACCEPTED
 **Date:** 2026-11-03
 
 ## 1. Purpose and status
 
 ### 1.1 Purpose
 
-This proposed addendum identifies and resolves outstanding normative questions arising from the accepted decision EABC-ADR-R1.
+This addendum identifies and resolves outstanding normative questions arising from the accepted decision EABC-ADR-R1.
 
 Its purpose is to establish an authority-reviewed basis for the subsequent coordinated migration of EABC documents 001–004.
 
@@ -49,10 +49,10 @@ The repository's `decisions/README.md` classifies decision records as non-normat
 
 Accordingly:
 
-- A1 is a proposed authority decision record, not normative EABC specification text.
-- If accepted, A1 SHALL provide the authority-approved basis for a subsequent normative migration.
+- A1 is an accepted authority decision record, not normative EABC specification text.
+- A1 provides the authority-approved basis for a subsequent normative migration.
 - A1 SHALL NOT itself be treated as proof that EABC 001–004 have been updated.
-- No implementation or deployment shall be considered conformant merely because it follows this proposed addendum.
+- No implementation or deployment shall be considered conformant merely because it follows this accepted addendum.
 
 Upon completion of the normative migration, the operative EABC specification requirements resulting from this decision SHALL reside in `docs/`. This decision record SHALL remain the historical authority record and SHALL NOT be treated as a parallel specification text or as an alternative source for implementation-level requirements.
 
@@ -882,7 +882,7 @@ Unless expressly clarified by A1, the following R1 decisions remain unchanged:
 11. The versioned EBP-006 legacy alias and its mapping to `NON_BYPASSABILITY`.
 12. The distinction between semantic adoption and implementation/deployment conformance.
 
-### 6.2 Questions resolved by A1, if accepted
+### 6.2 Questions resolved by A1
 
 A1 resolves the following outstanding questions:
 
@@ -957,15 +957,28 @@ The EABC Specification Authority is asked to approve or reject the following pro
 
 ### 7.3 Authority response
 
-**Outcome:** PENDING
+**Outcome:** ACCEPTED
+**Status:** ACCEPTED
 **Authority:** EABC Specification Authority
-**Decision date:** Pending
-**Accepted amendments:** Pending
-**Rationale:** Pending authority review
+**Authority Holder:** EABC Specification Authority holder
+**Decision date:** 2026-11-04
+**Accepted proposal:** The proposal recorded at commit `f44655d5d061f61658a7dc4503f5d3183af77430` is accepted with the authority resolutions recorded in this section. No textual amendments to the proposal are introduced.
+**Accepted decisions:** A1-D01, A1-D02, A1-D03, A1-D04, A1-D05, A1-D06, A1-D07, A1-D08, A1-D09, A1-D10, A1-D11, A1-D12, A1-D13, A1-D14, A1-D15, A1-D16, A1-D17, A1-D18, A1-D19, A1-D20, A1-D21, A1-D22, and A1-D23.
+**Textual amendments to A1:** None
+
+**Resolution of Annex B:**
+
+- **B.1 — INTEGRITY_DEF:** Option A is accepted. Prevention of unauthorized modification or substitution of the applicable boundary definition is required within the declared threat model. Detection alone is not an equivalent substitute.
+- **B.2 — N/A acceptance:** Transparent implementer self-accepted N/A is permitted where the implementer performs the assessment, provided the disposition is explicitly identified as self-accepted and transparently documented. This decision does not impose assessor independence.
+- **B.3 — P1 authority-change procedure:** The authority-change protocol may remain implementation- or profile-specific. The underlying normative P1 obligation remains preserved and MUST NOT be weakened; A1 does not prescribe a universal implementation protocol.
+
+**Rationale:** The accepted proposal preserves the five-property boundary semantic set, retains P1–P10 without loss, including both original P5 obligations, and separates semantic obligations from EBP assurance constraints. The Annex B resolutions above record the authority's explicit choices.
+
+**Effect:** This acceptance satisfies the A1 acceptance prerequisite in §6.4 and authorizes preparation of the coordinated normative migration of EABC 001–004 as a separate task. It does not itself modify any normative specification document or authorize implementation-profile, EGA/SIF, or EBP-006 changes.
 
 ## Annex A — Decision register
 
-All decisions below are proposals requiring explicit EABC Specification Authority approval.
+The decision register below records the proposals submitted for authority approval; their acceptance is recorded in §7.3.
 
 | ID | Decision | Alternatives | Recommendation |
 | --- | --- | --- | --- |
@@ -993,10 +1006,16 @@ All decisions below are proposals requiring explicit EABC Specification Authorit
 | A1-D22 | Migration sequence | Migrate immediately; or wait for separate A1 acceptance. | Accept A1 first, then prepare one coordinated 001–004 migration PR. |
 | A1-D23 | EXCLUSIVITY assessment requirements | Leave EXCLUSIVITY without assessment rules; or require reference-authority designation, candidate inventory with completeness method, conditioning relationships, and no new authority type for mutual conditioning. | Require the §2.6 assessment requirements; do not introduce a new entity type for mutually conditioned determinations. |
 
-## Annex B — Matters for confirmation during authority review
+## Annex B — Matters submitted for authority confirmation (resolved in §7.3)
 
-**B.1 Scope of Option A.** Option A is intentionally strong: unauthorized modification or substitution of the applicable boundary definition cannot occur under the declared threat model. It does not require physical immutability of every copy or archival representation. The Authority should confirm that this is the intended scope of prevention. If the Authority prefers detect-and-reject semantics for a particular class of implementation, it should select Option B explicitly rather than treating it as equivalent to Option A.
+**B.1 Scope of Option A.** Option A is intentionally strong: unauthorized modification or substitution of the applicable boundary definition cannot occur under the declared threat model. It does not require physical immutability of every copy or archival representation. The Authority should confirm that this is the intended scope of prevention. If the Authority had preferred detect-and-reject semantics, it would have needed to select Option B explicitly rather than treating it as equivalent to Option A.
 
-**B.2 N/A acceptance authority.** The record requires explicit acceptance by the party responsible for the conformance assessment and requires self-accepted N/A to be marked as such, but it does not define an assessor role or an organizational-independence requirement. If the Authority wants a particular assessor qualification, that should be added as an explicit decision rather than inferred from the term "assessor".
+**Resolution:** Accepted — Option A. See §7.3, B.1.
+
+**B.2 N/A acceptance authority.** The record requires explicit acceptance by the party responsible for the conformance assessment and requires self-accepted N/A to be marked as such, but it does not define an assessor role or an organizational-independence requirement. Any particular assessor qualification would require a separate explicit decision and is not introduced by this resolution.
+
+**Resolution:** Accepted — transparent implementer self-accepted N/A is permitted; assessor independence is not imposed. See §7.3, B.2.
 
 **B.3 P1 authority-change procedure.** The record identifies the distinction between the authority entitled to approve a change, the governed system's ability to request or provide information, and the governed system's inability to authorize its own authority change. It does not prescribe a universal authority-change protocol; that remains implementation- and profile-specific, provided the P1 obligation is satisfied.
+
+**Resolution:** Accepted — profile-specific protocol; the normative P1 obligation remains in force and is not weakened. See §7.3, B.3.
