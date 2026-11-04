@@ -12,28 +12,31 @@ The normative subject of each requirement is stated separately. A mapping betwee
 
 ## Relationship to the Execution Authority Whitepaper
 
-EABC remains accountable to the architectural principles and operationalization model of the Execution Authority research whitepaper. The original P1–P10 obligations retain their established relationship to the whitepaper and its operationalization layer. The boundary semantic set is an additional normative layer adopted by ADR R1 and clarified by accepted decision A1.
+EABC is not a freestanding property list. It operationalizes two distinct layers of the *Execution Authority* research whitepaper:
 
-EABC describes observable guarantees, not a mandatory implementation architecture, substrate, protocol, storage mechanism, or cryptographic construction.
+* the **five necessary properties of an Execution Authority** established in the whitepaper's theoretical foundation (Independence, Complete Mediation, Commit Control, Determinism, State/Context Binding) — referenced in the whitepaper's Section 12.1 as the properties "defined in Section 3";
+* the **operationalization layer** of the whitepaper (Sections 8–11: the Authorization Artifact, the Execution Attestation, the Verification Model, and the Assurance Registry), which introduces evidentiary and lifecycle requirements not present in the theoretical layer itself.
 
-The original P1–P10 obligations retain their established relationship to the Execution Authority whitepaper:
+Properties 1–5 below correspond directly to the whitepaper's five necessary properties. Properties 6–9 operationalize requirements that the whitepaper establishes structurally (through the ACT and EAtt artifacts and the verification model) but does not itself enumerate as named axioms. Property 10 is specific to EABC as a specification layer and has no whitepaper counterpart.
 
-| EABC obligation | Origin |
-|---|---|
-| P1 — Independent Execution Authority | Whitepaper Section 3 — Independence |
-| P2 — Complete Mediation | Whitepaper Section 3 — Complete Mediation |
-| P3 — Deterministic Commit Semantics | Whitepaper Section 3 — Determinism and Commit Control |
-| P4 — Context Binding | Whitepaper Section 3 — State/Context Binding (context component), operationalized through the ACT `context` and `constraints` fields |
-| P5 — State Binding | Whitepaper Section 3 — State/Context Binding (state component), operationalized through the ACT `validity` field and EAtt `execution_context` |
-| P6 — Evidence Integrity | Operationalization layer — EAtt `integrity` field |
-| P7 — Evidence Correlation | Operationalization layer — EAtt causal binding to ACT_hash |
-| P8 — Failure Semantics | Operationalization layer — Verification Outcome and EAtt `result` field |
-| P9 — Implementation Neutrality | Whitepaper Section 5.4 — Technology Neutrality |
-| P10 — Extensible Profiles | EABC-specific; realizes the expectation in Whitepaper Section 12.4 that implementation-level questions be resolved by a downstream specification |
+| EABC Property                     | Origin |
+| ----------------------------------- | -------- |
+| 1. Independent Execution Authority | Whitepaper Section 3 — Independence |
+| 2. Complete Mediation               | Whitepaper Section 3 — Complete Mediation |
+| 3. Deterministic Commit Semantics   | Whitepaper Section 3 — Determinism and Commit Control |
+| 4. Context Binding                  | Whitepaper Section 3 — State/Context Binding (context component); operationalized via the ACT `context`/`constraints` fields (Section 8.3) |
+| 5. State Binding                    | Whitepaper Section 3 — State/Context Binding (state component); operationalized via the ACT `validity` field and EAtt `execution_context` (Sections 8.3, 9.3) |
+| 6. Evidence Integrity               | Operationalization layer — EAtt `integrity` field (Section 9.3) |
+| 7. Evidence Correlation             | Operationalization layer — EAtt causal binding to ACT_hash (Section 9.4) |
+| 8. Failure Semantics                | Operationalization layer — Verification Outcome (Section 10.5) and EAtt `result` field (Section 9.3) |
+| 9. Implementation Neutrality        | Whitepaper Section 5.4 — Technology Neutrality |
+| 10. Extensible Profiles             | EABC-specific; no whitepaper counterpart. Realizes the whitepaper's Section 12.4 expectation that a future Specification "resolve the questions this paper deliberately leaves open at the implementation level." |
 
-This mapping preserves the original distinction between the whitepaper's theoretical properties and its operationalization layer. The five boundary semantic properties are an additional EABC normative layer adopted by ADR R1 and clarified by A1; they do not replace or renumber P1–P10.
+This mapping is intended to keep EABC answerable to the whitepaper's invariants, consistent with the asymmetric relationship described in the whitepaper's Section 12.4: EABC is derived from and constrained by the whitepaper, while the whitepaper's validity does not depend on any particular choice made here.
 
 ---
+
+The five boundary semantic properties are an additional EABC normative layer adopted by ADR R1 and clarified by accepted decision A1. They do not replace or renumber the original P1–P10 obligations, and the original distinction between the whitepaper's theoretical properties and its operationalization layer remains in force.
 
 # 1. Five boundary semantic properties
 
