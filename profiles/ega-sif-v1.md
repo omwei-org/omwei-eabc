@@ -347,6 +347,8 @@ This profile declares that EGA/SIF v1 satisfies the EABC contract through:
 
 A specific EGA/SIF implementation SHOULD publish additional deployment-specific evidence mappings.
 
+**Status note (post-migration baseline a4694af).** The conformance and property mappings in this profile were made against the pre-migration EABC P1–P10 formulation. They have not been re-assessed against the five boundary semantic properties adopted by EABC-ADR-R1 and EABC-ADR-R1-A1, nor against the P5 consumer-facing execution-state correspondence obligation (EABC 001, §2.2.6). This note does not alter or withdraw the mapping above; it records only that the profile has not been assessed under the post-migration EABC 001–004. It MUST NOT be read as a Level 1 conformance assessment under the post-migration EABC 004.
+
 ---
 
 # 10. Limitations
