@@ -126,6 +126,27 @@ Execution outcomes do not imply successful authorization.
 
 ---
 
+# P3 Check-to-Effect Atomicity
+
+P3 remains an EABC semantic obligation.
+
+Its scope includes:
+
+- explicit representation of the transition between authorization and execution;
+- deterministic interpretation of the transition outcome;
+- preservation of the distinction between authorization, attempted execution, committed effect, and execution failure;
+- check-to-effect atomicity, meaning the absence of a gap between the decision and the effect it authorizes.
+
+The current EABC 003 statement that atomicity of an authorization/commit transition does not by itself establish atomicity between COMMIT and a subsequent external EFFECT remains valid.
+
+Where COMMIT and a subsequent external EFFECT are distinct stages, the execution-boundary semantics MUST establish the check-to-effect atomicity required by P3.
+
+`INTEGRITY_CTX(C,B,E)` does not establish P3 check-to-effect atomicity. A context binding can remain authentic while a gap between the decision and the effect occurs. Conversely, an atomic transition can still be bound to the wrong context or effect. The two obligations MUST be assessed separately.
+
+`TEMPORAL_CONSISTENCY` and `MAX_ENFORCEMENT_LATENCY` remain EBP assurance constraints. They may qualify assurance of an implementation's P3 satisfaction but MUST NOT replace or redefine P3.
+
+This clarification does not introduce a new verification primitive. The existing `FINAL_AUTHORITY_CHECK` and `COMMIT_CONDITIONS` remain distinct commit-time gates.
+
 # Atomic Binding
 
 Some architectures perform authorization and execution as one indivisible transaction.
@@ -141,7 +162,7 @@ even if both originate from the same event.
 
 Atomic implementations MUST NOT obscure either semantic.
 
-Atomicity of an authorization/commit transition does not by itself establish atomicity between `COMMIT` and the subsequent external `EFFECT`. Any guarantee concerning that boundary requires its own execution-boundary semantics.
+The execution-boundary semantics MUST establish the check-to-effect atomicity required by P3 where COMMIT and the subsequent external EFFECT are distinct stages.
 
 ---
 
