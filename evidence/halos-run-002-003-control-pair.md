@@ -88,7 +88,7 @@ Its execution evidence records PREPARE, FINAL_AUTHORITY_CHECK, and EXECUTION/COM
 
 **Path-set completeness:** `NOT ESTABLISHED`. This record does not enumerate every path capable of changing the relay state.
 
-The Protected Effect is not narrowed to the implementation or to the GIE path. The pair demonstrates mediation of the tested path, not `NON_BYPASSABILITY(B,E)` across all paths capable of producing the Protected Effect.
+The Protected Effect is not narrowed to the implementation or to the GIE path. The pair provides reported evidence of mediation on the tested path; it does not establish `NON_BYPASSABILITY(B,E)` across all paths capable of producing the Protected Effect.
 
 ## 4. Paired interpretation
 
