@@ -589,9 +589,9 @@ Where materiality or its effect on the guarantee cannot be determined, the affec
 
 ## 11. Authority decisions and remaining open items
 
-### 11.1 Decisions incorporated in this proposal
+### 11.1 Accepted Authority decisions
 
-This proposal adopts the following design positions, subject to Authority acceptance:
+The EABC Specification Authority has accepted the following design positions as part of EBP v0.2.3:
 
 1. Multiple applicable EBP profiles are cumulative by default within overlapping assessment scope.
 2. Alternative profile selection requires explicit authorization by the applicable contract or policy.
