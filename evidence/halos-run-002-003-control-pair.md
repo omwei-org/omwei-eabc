@@ -110,7 +110,7 @@ The pair therefore provides implementation evidence for the following bounded ob
 
 This is evidence of observed behavior in the tested implementation. It is not, by itself, an exhaustive validation of all possible authority transitions, verifier failures, or execution failure modes.
 
-## 4. Integrity and provenance
+## 5. Integrity and provenance
 
 Run 003 was committed to the HALOS repository and published through CI.
 
@@ -136,7 +136,7 @@ The SHA-256 value was independently checked against the generated Run 003 eviden
 
 Run 002 remains the existing reference baseline and its CI publication was preserved unchanged.
 
-## 5. EABC evidence-model mapping
+## 6. EABC evidence-model mapping
 
 The pair exercises several existing evidence concepts:
 
@@ -151,7 +151,7 @@ These are observations against the existing EABC evidence model. The HALOS imple
 
 In particular, `STALE_EPOCH` is recorded as an implementation-side reason. It is not introduced as a new EABC authorization outcome.
 
-## 6. What this evidence establishes
+## 7. What this evidence establishes
 
 Within the tested HALOS/GIE implementation:
 
@@ -164,7 +164,7 @@ Within the tested HALOS/GIE implementation:
 7. the two cases use the same governed execution path and payload;
 8. the evidence artifacts are published independently through CI.
 
-## 7. What this evidence does not establish
+## 8. What this evidence does not establish
 
 This pair does **not** establish:
 
@@ -179,7 +179,7 @@ This pair does **not** establish:
 
 Missing or unobservable cases remain validation gaps rather than successful outcomes.
 
-## 8. Relationship to normative EABC
+## 9. Relationship to normative EABC
 
 This record is subordinate to the existing EABC specification and evidence model.
 
@@ -192,7 +192,7 @@ It does not modify:
 
 The purpose is to preserve concrete implementation evidence that can be independently inspected and compared with later evidence from other implementations.
 
-## 9. Reproduction anchors
+## 10. Reproduction anchors
 
 An independent reviewer can begin verification from:
 
