@@ -44,7 +44,7 @@ Classes: Q = verbatim quotation of the original P1 obligation; D = defining sent
 | 2 | §4.1 Original P1 obligation | Q | Execution authority MUST originate from a trust domain that is independent of the governed execution domain. |
 | 3 | §4.2 Authority-Origin Independence | D | Execution authority MUST originate from a trust domain that is independent of the governed execution domain. |
 | 4 | §4.2 Authority-Origin Independence | C | A request submitted to, or authority granted by, an entity that originates from an independent trust domain and is entitled to grant it is not self-authorization. |
-| 5 | §4.2 Authority-Origin Independence | C | The definition of Authority-Origin Independence in ADR R1 §5 SHALL NOT be read as narrowing the original P1 trust-domain requirement to an identity test of a single entity. The independent trust-domain relationship remains part of the requirement. |
+| 5 | §4.2 Authority-Origin Independence | C | The independent trust-domain relationship remains part of the requirement. |
 | 6 | §5.2 Relationship to EBP assurance constraints | T | Assurance qualification concerning the enforcement mechanism's independence from the governed actor's trust domain or failure modes |
 | 7 | §5.3 P1–P10 reconciliation | T | Preserve the independent trust-domain origin requirement and anti-self-authorization. Map bypass to `NON_BYPASSABILITY`. Retain unauthorized modification of established execution authority as an explicit P1 sub-obligation. |
 | 8 | §3 Terminology and separation from EBP assurance | T | Execution authority originates from a trust domain independent of the governed execution domain; the governed system cannot self-authorize. |
@@ -52,7 +52,7 @@ Classes: Q = verbatim quotation of the original P1 obligation; D = defining sent
 ## 4. Deferred rewording (A2 §2.5(4))
 
 - §4.2 Authority-Origin Independence: "A request submitted to, or authority granted by, an entity that originates from an independent trust domain and is entitled to grant it is not self-authorization."
-- §4.2 Authority-Origin Independence: "The definition of Authority-Origin Independence in ADR R1 §5 SHALL NOT be read as narrowing the original P1 trust-domain requirement to an identity test of a single entity. The independent trust-domain relationship remains part of the requirement."
+- §4.2 Authority-Origin Independence: "The independent trust-domain relationship remains part of the requirement."
 
 No change to `docs/001` is made or authorized by this erratum. The listed sentences are to be reworded when their section is next revised under the normal change process.
 
