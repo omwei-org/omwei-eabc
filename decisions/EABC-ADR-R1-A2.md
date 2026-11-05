@@ -4,19 +4,19 @@
 **Title:** Scope of the Qualified-Independence Terminology Rule  
 **Parent Decision:** EABC-ADR-R1 (supplements R1 §5)  
 **Authority:** EABC Specification Authority  
-**Status:** PROPOSED  
-**Outcome:** PENDING AUTHORITY REVIEW  
-**Date:** 2026-11-04
+**Status:** ACCEPTED  
+**Outcome:** ACCEPTED  
+**Proposal date:** 2026-11-04
 
 ## 1. Purpose and status
 
-This proposed addendum clarifies the scope of the terminology rule in ADR R1 §5, which states:
+This addendum clarifies the scope of the terminology rule in ADR R1 §5, which states:
 
 > These terms shall not be used interchangeably. The bare word "independent" shall not be used in normative text without one of these qualifiers.
 
 The post-migration consistency audit of baseline `a4694af887ce4360c330bd5af76da9225b7dfa88` (finding F-02) found unqualified uses of "independent" in normative text of EABC 001–005, for example "independent assessor", "independent consumer", "independent verification", and "independent implementations". Read literally, R1 §5 prohibits them. Most of them do not denote any of the three meanings of independence that R1 §5 defines.
 
-A2 is a proposed authority decision record. It is non-normative; normative changes follow separately in `docs/`. A2 does not amend or overwrite R1, which remains the historical record. A2 does not modify any definition of R1 or A1.
+A2 is an authority decision record. It is non-normative; normative changes follow separately in `docs/`. A2 does not amend or overwrite R1, which remains the historical record. A2 does not modify any definition of R1 or A1.
 
 ## 2. Decision
 
@@ -70,9 +70,9 @@ A2 does not introduce a new property, definition, or requirement. It does not ch
 
 ## 4. Annex (non-normative) — classification of the uses found by the audit
 
-The following classification is proposed and MUST be confirmed against the text in the editorial change.
+The following classification is confirmed against the authorized editorial change.
 
-| Use | Proposed classification |
+| Use | Classification |
 | --- | --- |
 | "independent assessor" (e.g. EABC 004 §3.3.1) | General-language; reference: the implementer being assessed. It describes the sufficiency of evidence for a third party. It does not introduce a requirement for assessor independence (A1 Annex B.2). SHOULD be reworded to "third-party assessor" on the next revision of that section. |
 | "independent consumer" | General-language; reference: the producer of the evidence. |
@@ -83,8 +83,8 @@ The following classification is proposed and MUST be confirmed against the text 
 
 ## 5. Authority response
 
-**Outcome:** PENDING  
+**Outcome:** ACCEPTED  
 **Authority:** EABC Specification Authority  
-**Decision date:** Pending  
-**Accepted amendments:** Pending  
-**Rationale:** Pending authority review
+**Decision date:** 2026-11-05  
+**Accepted amendments:** A2-D01 through A2-D05, without amendment.  
+**Rationale:** The rule in R1 §5 is limited to the three qualified technical meanings of independence. Ordinary general-language uses remain permissible where their reference is determinable and they do not denote one of those meanings. Retained property names and section headings remain unchanged. The EBP-006 "Independence" label is deferred to EBP assurance alignment. The authorized editorial alignment is limited to EABC 001 §3 as specified in §2.5(2).
