@@ -1,4 +1,11 @@
 # Validation Run 002 — Prepare / Authority Change / Commit
+**Evidence metadata**
+
+- `record_type`: `plan`
+- `evidence_state`: `declared`
+- `reproduction_state`: `source-only`
+- `realization`: `not-established` — no immutable EBP §1.4 realization description is currently linked to this record.
+
 
 > **Disambiguation:** This cross-organization prepare/authority-change plan is distinct from the HALOS/GIE single-implementation control pair in [halos-run-002-003-control-pair.md](./halos-run-002-003-control-pair.md).
 
