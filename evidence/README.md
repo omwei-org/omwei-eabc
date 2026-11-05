@@ -86,6 +86,7 @@ The evidence state and reproduction state are independent dimensions. In particu
 | Validation Run 001 | `run` | `reported` | `source-only` | Source journal entries supplied; hash recomputation documented, original live run not independently rerun |
 | Validation Run 002 | `plan` | `declared` | `source-only` | Planned experiment; not executed |
 | GR00T recording-transport test plan | `plan` | `declared` | `source-only` | Plan only; execution results are recorded in the GR00T observation |
+| Pinned LeRobot driver test script | `script` | `declared` | `source-only` | Test harness source; the run outcomes are recorded in the GR00T observation |
 
 The metadata is a conservative snapshot of the records at this revision. It does not replace each record's detailed scope, provenance, or limitations.
 
