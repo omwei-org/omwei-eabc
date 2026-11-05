@@ -72,7 +72,7 @@ A2 does not introduce a new property, definition, or requirement. It does not ch
 
 The following classification is confirmed against the authorized editorial change.
 
-| Use | Proposed classification |
+| Use | Classification |
 | --- | --- |
 | "independent assessor" (e.g. EABC 004 §3.3.1) | General-language; reference: the implementer being assessed. It describes the sufficiency of evidence for a third party. It does not introduce a requirement for assessor independence (A1 Annex B.2). SHOULD be reworded to "third-party assessor" on the next revision of that section. |
 | "independent consumer" | General-language; reference: the producer of the evidence. |
