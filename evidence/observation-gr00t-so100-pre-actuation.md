@@ -1,4 +1,11 @@
 # Evidence Reference — GR00T SO100/SO101 Pre-Actuation Path
+**Evidence metadata**
+
+- `record_type`: `observation`
+- `evidence_state`: `reported`
+- `reproduction_state`: `reproducible-from-record`
+- `realization`: `not-established` — no immutable EBP §1.4 realization description is currently linked to this record.
+
 
 **Update:** Sections 11 and 12 record later runtime tests at the mocked SDK boundary; physical actuation remains untested.
 
