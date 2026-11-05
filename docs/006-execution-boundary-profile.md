@@ -1,117 +1,330 @@
 # 006 — Execution Boundary Profile (EBP)
 
-**Status:** Draft v0.1 (open items updated; design-notes promoted to normative-style prose; not yet cross-reviewed against `docs/002` and `docs/004`for terminology drift)
+**Version:** 0.2.3  
+**Status:** Accepted by EABC Specification Authority  
+**Document role:** EBP assurance framework  
+**Normative dependencies:** EABC 001–004; EABC-ADR-R1; EABC-ADR-R1-A1; EABC-ADR-R1-A2
 
-## 0. Purpose and Scope
+---
 
-This document defines the **Execution Boundary Profile (EBP)**, an extension layer on top of EABC Core (`docs/000`–`005`) that addresses one question Core deliberately leaves open: *which implementation substrate (software, hardware, or a composite of the two) is permitted to realize a given execution boundary, and how is that permission established and kept current?*
+## 1. Purpose and scope
 
-EBP does **not** decide substrate. Deciding SW vs. HW placement at the level of the contract itself would violate Core's Implementation Neutrality principle (`docs/001`, Property 9) and would introduce a runtime decision point structurally analogous to a TLS-downgrade vulnerability — a place where an adversary can push the system toward the weaker-but-still-"conformant" option. EBP instead states only the **properties** an execution boundary must satisfy for a given protected effect. Which concrete implementation — software-only, hardware-only, or composite — satisfies those properties is answered by **conformance assessment**, not by the contract.
+### 1.1 Purpose
 
-> **Core principle:** EABC determines the properties an execution boundary must satisfy for a given protected effect; conformance assessment determines which implementation (software, hardware, or composite) satisfies them. A hardware requirement is therefore always a *consequence* of conformance assessment against stated properties, never a normative choice made by EABC itself.
+The Execution Boundary Profile (EBP) defines an assurance layer for evaluating whether a concrete execution-boundary realization provides the assurance required by an applicable contract or execution policy.
 
-## 1. Relationship to EABC Core
+EBP specifies:
 
-EBP is additive. It introduces one new contract section within `ExecutionBoundaryContract` and one new semantic plane (the *conformance plane*), and otherwise reuses or extends Core mechanisms rather than duplicating them. Everything Core already defines about per-commit authority and evidence (`docs/001`–`003`) continues to apply unchanged to any implementation that adopts EBP.
+- which additional assurance requirements apply to a declared execution-boundary property;
+- which adversary model and guarantee those requirements address;
+- which assurance constraints must hold;
+- what evidence is required to assess the concrete realization; and
+- whether the resulting assurance remains valid for the assessed instance and deployment.
 
-The full Core ↔ EBP crosswalk (13 elements) is normative and given in §7.
+EBP does not redefine EABC properties, create execution authority, or prescribe the implementation substrate.
 
-## 2. Required Boundary Properties
+### 1.2 Relationship to EABC
 
-`ExecutionBoundaryContract` extends the existing per-commit contract sections (Authority Conditions, Boundary Conditions, Commit Conditions — see `docs/001`, `docs/003`) with a fourth, structurally different section:
+EABC defines the normative execution-authority obligations and the five boundary semantic properties.
 
-**REQUIRED BOUNDARY PROPERTIES** — a static, instance-scoped set of properties that a candidate implementation must satisfy before it is eligible to serve any commit under this contract. Unlike Authority/Boundary/Commit Conditions, which are evaluated per-commit, Required Boundary Properties are evaluated once per implementation instance via conformance assessment (§3), not on every transaction.
+EBP qualifies the assurance of a concrete implementation against declared assurance requirements. It does not replace EABC assessment or establish EABC conformance by itself.
 
-### 2.1 Protected Effect Scope and Path Scope
+The following distinctions are normative:
 
-The Required Boundary Properties are assessed relative to an explicitly declared **Protected Effect Scope**. The scope identifies the externally observable consequence for which the execution boundary is being claimed as authoritative.
+1. EABC defines what must be satisfied.
+2. An applicable EBP profile specifies additional assurance requirements for a declared property.
+3. The SLC implementation realizes the required enforcement behavior using a concrete architecture and substrate.
+4. Assessment evaluates the concrete realization and its evidence against EABC and applicable EBP requirements.
 
-A Protected Effect Scope MUST be sufficiently specific to determine which execution paths are relevant to the conformance claim. The scope MAY cover one protected effect, a defined class of effects, or a bounded set of resources and transitions. A claim MUST NOT be interpreted as global beyond the scope declared by the applicable contract and threat model.
+EBP assurance tiers MUST NOT replace, waive, or silently redefine EABC requirements or conformance levels.
 
-For the purposes of Complete Mediation and the EBP path requirement, the assessment scope is further represented as a **Path Scope**:
+### 1.3 Implementation neutrality
 
-- **Protected Effect Scope** — what externally observable consequence is protected.
-- **Path Scope** — the set of in-scope execution paths that are capable of producing that protected effect under the declared threat model.
-- **Boundary Scope** — the execution-authority boundary that is claimed to mediate those paths.
+EBP MUST NOT prescribe a particular substrate or rank substrates as universally stronger or weaker.
 
-The relationship is:
+A substrate is a characteristic of the concrete SLC realization, not a property selected by EBP.
 
-```text
-Protected Effect Scope
-        │
-        ▼
-   Path Scope
-        │
-        ▼
-Complete Mediation (Core P2)
-        │
-        ▼
-`NON_BYPASSABILITY(B,E)`
-```
+Possible realizations include, without limitation:
 
-**Complete Mediation** is the Core property that every in-scope path capable of producing the protected effect is subject to the applicable authority boundary. The corresponding EBP boundary-level semantic property is `NON_BYPASSABILITY(B,E)`: every in-scope path capable of producing Protected Effect E is mediated by the applicable boundary B. The historical EBP-006 identifier `EBP-006:Exclusivity@v1` maps to this one canonical property. The claim requires both (A) adequate path-scope and deployment-topology completeness evidence establishing that the in-scope path inventory is complete or adequately bounded, and (B) adequate boundary-mediation evidence establishing that each identified in-scope path is mediated by B.
+- software enforcement;
+- a Trusted Execution Environment (TEE);
+- an MCU combined with a Secure Element;
+- FPGA, ASIC, or a hardware enforcement co-processor;
+- ISA- or processor-pipeline-level enforcement; and
+- hybrid realizations combining multiple mechanisms.
 
-`NON_BYPASSABILITY(B,E)` does not replace Core Property 2; it is the single EBP boundary-level semantic property used to substantiate that the deployment topology and boundary behavior support Complete Mediation for the declared scope. Deployment-topology completeness and boundary mediation are distinct evidence aspects of this same property, not separate semantic properties. Topology evidence alone does not establish that the boundary mediates the identified paths; boundary-behavior evidence alone does not establish that the path inventory is complete.
+These examples are implementation possibilities, not EBP profiles, assurance tiers, or presumptive conformance outcomes.
 
-### 2.2 Threat Model and Scope of a Non-bypass Claim
+The suitability of a realization MUST be assessed against the applicable EABC requirements, adversary model, guarantee, assurance constraints, and deployment assumptions.
 
-#### Legacy EBP-006 terminology migration (EABC-ADR-R1 §6)
+### 1.4 Concrete realization under assessment
 
-The historical EBP-006 term **Exclusivity**, when used to mean the absence of an in-scope execution path to the Protected Effect that bypasses the boundary, is identified by the versioned legacy identifier:
+The object of an EBP assurance assessment is a concrete realization:
 
-`EBP-006:Exclusivity@v1`
+`R = (SLC, substrate, configuration, deployment assumptions)`
 
-Its semantic migration mapping is:
+The assessment MUST identify the realization sufficiently to establish what was evaluated.
 
-`EBP-006:Exclusivity@v1` → `NON_BYPASSABILITY`
+A statement that a substrate is generally secure, isolated, certified, or tamper-resistant does not by itself establish that the concrete realization satisfies an EBP profile.
 
-This mapping preserves the original path-exclusion meaning. It concerns execution paths capable of producing the Protected Effect and whether those paths are mediated by the boundary. It does **not** concern the existence or absence of independent or parallel Commit Authorities.
+A change to the SLC, substrate, configuration, or a deployment assumption that is material to a claimed guarantee MUST trigger reassessment of the affected assurance claims. Previously recorded assessment results MUST NOT be presumed valid for a materially changed realization.
 
-This is a terminology/reference migration only. It does not retroactively rewrite the historical EBP-006 text, and it does not define or introduce the future authority-based EABC property `EXCLUSIVITY(A,E,I)`. That property is not specified or made normative by this document.
+---
 
-The historical identifier `EBP-006:Exclusivity@v1` denotes the path-exclusion meaning now named `NON_BYPASSABILITY(B,E)`; it does not refer to independent or parallel Commit Authorities. **Non-bypass** is not a second semantic property. The former Non-bypass wording is retained only as an evidence requirement/dimension for deployment-topology completeness, distinct from boundary-mediation evidence. Both evidence aspects remain necessary to substantiate the single no-bypass-path claim.
+## 2. EBP assurance profile
 
+### 2.1 Profile structure
 
-A non-bypass claim MUST state the threat model and scope under which it is assessed.
+An EBP assurance profile is a versioned specification of assurance requirements.
 
-At minimum, the conformance record MUST identify:
+The profile is represented by:
 
-- the Protected Effect Scope;
-- the Path Scope or the method by which all in-scope paths are enumerated or bounded;
-- the execution-boundary instance and its binding to the contract;
-- the applicable Required Boundary Properties;
-- the threat model defining which alternative paths, actors, compromise assumptions, and environmental conditions are in scope; and
-- the evidence and assessment method used to substantiate the claim.
+`EBP = {property, adversary_model, guarantee, assurance_constraints}`
 
-The phrase **non-bypassable** MUST NOT be interpreted as an unconditional claim that no conceivable path exists. It means that, under the declared Protected Effect Scope, Path Scope, deployment configuration, and threat model, the required boundary properties have been assessed as satisfied and no in-scope path capable of producing the protected effect bypasses the boundary.
+Where:
 
-If a relevant path is outside the declared threat model or cannot be bounded by the assessment method, that limitation MUST be explicit in the conformance evidence. It MUST NOT be silently treated as evidence that the path is absent.
+- `property` identifies the EABC boundary semantic property whose assurance is being qualified;
+- `adversary_model` identifies the adversary capabilities, trust assumptions, and relevant scope;
+- `guarantee` states the assurance claim required against that adversary model; and
+- `assurance_constraints` identify the additional constraints that the realization and its deployment must satisfy.
 
-This scope discipline also prevents a fresh implementation attestation or an implementation identity claim from being used as a substitute for `NON_BYPASSABILITY(B,E)` evidence. As stated in §4.1, **Fresh Attestation ≠ `NON_BYPASSABILITY(B,E)`** and **Implementation Identity ≠ `NON_BYPASSABILITY(B,E)`**.
+The `property` field MUST identify one of the five EABC boundary semantic properties:
 
-The initial property set:
+1. `NON_BYPASSABILITY(B,E)`
+2. `INTEGRITY_DEF(B)`
+3. `INTEGRITY_STATE(B,E)`
+4. `INTEGRITY_CTX(C,B,E)`
+5. `EXCLUSIVITY(A,E,I)`
 
-- **Independence** — the boundary's admit/refuse decision is not controllable by the party whose action is being evaluated.
-- **`NON_BYPASSABILITY(B,E)`** — every in-scope path capable of producing Protected Effect E is mediated by the applicable boundary B. Its historical EBP-006 identifier is `EBP-006:Exclusivity@v1` (legacy path-exclusion terminology; not authority exclusivity). This is one semantic property, supported by two distinct evidence aspects:
-  - **Deployment-topology completeness evidence** — establishes that the declared path inventory is complete or adequately bounded and that no in-scope alternative path has been omitted.
-  - **Boundary-mediation evidence** — establishes that each identified in-scope path is actually mediated by B.
+An EBP profile MUST NOT introduce a sixth EABC boundary semantic property or redefine the normative meaning of an existing property.
 
-  The earlier label **Non-bypass** is retained only as a name for the deployment-topology evidence requirement/dimension; it does not define a second semantic property. Neither evidence aspect alone is sufficient to establish `NON_BYPASSABILITY(B,E)`.
-- **Physical non-extractability** — where the boundary's own state or keys are the thing being protected, they cannot be extracted or replayed at the layer being assessed.
-- **Isolation** — the boundary's execution is not observable-or-influenceable by co-located, non-boundary processes.
-- **Renderer integrity** — where the boundary emits evidence or a claim-set for consumption by another system, the emitting logic itself has not been altered from its assessed form.
+### 2.2 Adversary model
 
-**Classification test** (for any future candidate property): if satisfying it depends on instance identity, configuration, measurement, or isolation state, it is a Required Boundary Property. If it is a per-commit dynamic predicate (e.g., exact-action binding, schema validity of the request itself), it stays in Core's Authority/Boundary Conditions and does not belong here.
+Each profile MUST identify the adversary model against which its guarantee is claimed.
 
-## 3. Conformance Lifecycle
+The adversary model MUST be sufficiently specific to identify:
 
-EBP separates three events that are easy to conflate but must not be merged:
+- adversary capabilities;
+- relevant trust assumptions;
+- protected effect and boundary scope, where applicable;
+- components, interfaces, and execution paths within the assessment scope; and
+- relevant exclusions or residual risks.
 
-1. **Assessment** — a static determination: does implementation instance *i* satisfy the Required Boundary Properties of contract *c*? Performed once (or on each material change to *i*), not per-commit.
-2. **Attestation** — the evidence artifact that carries the claim that Assessment succeeded (see §4).
-3. **Validity** — whether that Attestation is *currently* acceptable. This can be a runtime question (revocation, expiry, staleness) even though Assessment itself is not.
+A generic threat-model label without a declared relationship to the assessed realization and property is insufficient.
 
-### 3.1 Locked formulas
+The adversary model is an assessment parameter. It does not prescribe a substrate or implementation mechanism.
+
+### 2.3 Guarantee
+
+The guarantee MUST state what the assessed realization is required to establish against the declared adversary model.
+
+A guarantee MUST be assessable against evidence. Statements of design intent, product capability, certification status, or vendor assurance alone MUST NOT be treated as proof that the guarantee is satisfied.
+
+The guarantee MUST NOT exceed what the declared adversary model, evidence, and assessment scope support.
+
+### 2.4 Assurance constraints
+
+Assurance constraints specify additional conditions under which the guarantee is claimed.
+
+Assurance constraints MAY address, where relevant:
+
+- enforcement independence;
+- temporal consistency;
+- maximum enforcement latency;
+- freshness and validity;
+- instance identity and binding;
+- configuration integrity;
+- deployment assumptions; and
+- other profile-specific assurance conditions.
+
+A constraint MUST identify its scope and the claim it qualifies.
+
+A constraint MUST NOT be presented as a new EABC boundary semantic property unless separately adopted through the EABC specification authority process.
+
+### 2.5 Required qualified terminology
+
+The following three meanings MUST remain distinct:
+
+1. **Authority-Origin Independence** — the P1 authority-origin requirement.
+2. **Enforcement Independence** — the EBP assurance meaning concerning whether the boundary's admit/refuse decision is controllable by the party whose action is being evaluated.
+3. **Non-Parallelism** — the absence of a Parallel Commit Authority within `EXCLUSIVITY(A,E,I)`.
+
+Where one of these meanings is intended, normative text MUST use its qualified term.
+
+The unqualified words "independent" and "independence" MUST NOT be used in normative text to denote any of these three meanings.
+
+General-language uses are permitted where the reference is determinable and the use does not denote one of the three qualified meanings. Where ambiguity is reasonably possible, wording such as "third-party" or an explicit reference SHOULD be used.
+
+The historical EBP-006 Required Boundary Property label `Independence` is reconciled to the qualified term `ENFORCEMENT_INDEPENDENCE`.
+
+The existing EBP-006 definition of the underlying assurance meaning is retained unless expressly amended by the applicable specification authority. This terminology reconciliation does not introduce a sixth EABC boundary semantic property.
+
+---
+
+## 3. Relationship to EABC semantic requirements
+
+### 3.1 Five boundary semantic properties
+
+EBP profiles qualify assurance for one or more of the five EABC boundary semantic properties. They MUST NOT replace the EABC assessment of those properties.
+
+The normative definitions remain in EABC 001 and the accepted decisions R1 and A1.
+
+In particular:
+
+- `NON_BYPASSABILITY(B,E)` concerns complete mediation of every in-scope path capable of producing the Protected Effect.
+- `INTEGRITY_DEF(B)` concerns authenticity and integrity of the applicable boundary definition, including its binding to the deciding boundary instance.
+- `INTEGRITY_STATE(B,E)` concerns authenticity and integrity of the runtime state used by the boundary in its determination.
+- `INTEGRITY_CTX(C,B,E)` concerns the authenticity, provenance, and binding of execution context to the boundary and Protected Effect.
+- `EXCLUSIVITY(A,E,I)` concerns the absence of a Parallel Commit Authority for the same Protected Effect, scope, and Authority Interval.
+
+An EBP assurance result for one property MUST NOT automatically establish another property.
+
+### 3.2 NON_BYPASSABILITY and Enforcement Independence
+
+A `NON_BYPASSABILITY(B,E)` assessment MUST declare the applicable `ENFORCEMENT_INDEPENDENCE` qualification as a separate EBP assurance qualification, as required by ADR R1.
+
+The qualification does not alter the semantic definition of `NON_BYPASSABILITY` and MUST NOT be treated as evidence of path completeness or boundary mediation.
+
+A semantic `NON_BYPASSABILITY` claim with an unspecified `ENFORCEMENT_INDEPENDENCE` qualification MAY be recorded as such. It MUST NOT be used to assign an assurance tier or make a conformance assertion that depends on that qualification until the applicable level has been declared and assessed.
+
+The assessment MUST continue to establish both evidence dimensions required by EABC 001:
+
+1. deployment-topology completeness; and
+2. boundary mediation.
+
+Neither dimension substitutes for the other.
+
+### 3.3 P3 and temporal assurance
+
+P3 — Deterministic Commit Semantics — remains an EABC semantic obligation.
+
+It includes the required deterministic interpretation of the authorization and execution transition and check-to-effect atomicity: there MUST NOT be a gap between the decision and the effect it authorizes.
+
+`TEMPORAL_CONSISTENCY` and `MAX_ENFORCEMENT_LATENCY` are EBP assurance constraints. They MAY qualify the assurance of a concrete realization's satisfaction of P3.
+
+They MUST NOT:
+
+- replace P3;
+- redefine P3;
+- turn P3 into an EBP profile property;
+- establish P3 solely by satisfying a timing threshold; or
+- be treated as a substitute for the required execution-boundary semantics.
+
+Where COMMIT and a subsequent external EFFECT are distinct stages, the assessment MUST address the check-to-effect atomicity required by P3. Atomicity of an authorization/commit transition alone does not establish atomicity between COMMIT and a subsequent external EFFECT.
+
+For avoidance of doubt, P3 is not an additional value of the EBP `property` field.
+
+An EBP profile MAY reference P3 as an EABC obligation when specifying relevant assurance constraints or evidence requirements. Such a reference does not make P3 an EBP profile property.
+
+The applicable EABC P3 obligation MUST be assessed under its own normative meaning, independently of whether a corresponding EBP profile applies.
+
+### 3.4 Integrity and freshness
+
+`INTEGRITY_STATE(B,E)` establishes authenticity and integrity, not freshness.
+
+An authentic state representation may be stale. Where freshness is required by the applicable threat model or contract, it MUST be specified and assessed as a separate assurance concern.
+
+An EBP profile MAY specify freshness, validity, or state-age constraints. Such constraints MUST NOT be presented as a sixth EABC boundary semantic property or silently inserted into the definition of `INTEGRITY_STATE(B,E)`.
+
+### 3.5 Context provenance and factual correctness
+
+`INTEGRITY_CTX(C,B,E)` concerns context authenticity, provenance, and binding.
+
+Provenance alone does not establish factual truth or correctness. Where factual validation or corroboration is required, the applicable requirement and validation basis MUST be specified separately.
+
+An EBP profile MUST NOT collapse context provenance and factual correctness into one undifferentiated claim.
+
+### 3.6 P5 correspondence
+
+An EBP profile or assurance result concerning `INTEGRITY_STATE(B,E)` MUST NOT be treated as automatically establishing both original P5 obligations.
+
+The original obligations remain distinct:
+
+1. identification of the state against which authorization was evaluated; and
+2. the consumer-facing ability to determine whether execution occurred against the intended reference state or condition, with the relationship between the two expressly bound to the authorization decision.
+
+The second obligation MUST be assessed under the applicable EABC authorization and execution semantics. Evidence of state authenticity and determination-binding alone is insufficient.
+
+---
+
+## 4. Profile applicability and selection
+
+### 4.1 Source of profile requirements
+
+An EBP profile applies only where an applicable contract, Execution Boundary Policy, or other authoritative requirement expressly references that profile or otherwise establishes its applicability.
+
+The source establishing profile applicability MUST be identifiable and versioned or otherwise unambiguously identifiable.
+
+Execution Boundary Policy is an external policy input. It is not an EABC property and MUST NOT be used to waive or select away EABC property assessments.
+
+Execution Boundary Policy MAY specify:
+
+- which EBP profiles apply;
+- the scope in which each profile applies;
+- applicable profile versions;
+- profile-specific parameters; and
+- the rules governing profile applicability and reassessment.
+
+### 4.2 Absence of a profile obligation
+
+This version does not introduce a `NO_PROFILE_REQUIRED` status or enum.
+
+Where no applicable contract or policy imposes an EBP profile obligation, the absence of a profile reference means only that no additional EBP profile obligation is imposed by that source.
+
+This absence MUST NOT be interpreted as:
+
+- an EABC property being inapplicable;
+- an EABC property being satisfied;
+- EABC conformance being established;
+- a substrate being approved or unrestricted; or
+- `CONFORMANCE_ELIGIBLE` being automatically satisfied.
+
+The absence of a profile obligation does not remove the need to assess all applicable EABC requirements.
+
+### 4.3 Missing required profile selection
+
+Where an applicable contract or policy requires an EBP profile, but the required profile or its applicable version cannot be identified, the required assurance condition has not been established.
+
+The EBP assessment MUST be recorded as `INDETERMINATE` for the affected requirement.
+
+A missing required profile MUST NOT be interpreted as an absence of a profile obligation.
+
+### 4.4 Profile selection record
+
+Where EBP profiles apply, the assessment record MUST identify:
+
+1. the authoritative contract or policy source;
+2. its version or other unambiguous identity;
+3. the applicable profile identifiers and versions;
+4. the scope of applicability;
+5. any required profile parameters; and
+6. any unresolved applicability or selection condition.
+
+This record MUST make it possible to distinguish an actual absence of a profile obligation from a missing or unresolved selection required by the applicable policy.
+
+### 4.5 Multiple applicable profiles
+
+Each applicable EBP profile MUST be assessed independently against its declared property, adversary model, guarantee, assurance constraints, and scope.
+
+Where multiple profiles impose requirements on overlapping assessment scope, their applicable requirements are cumulative by default.
+
+A contract or policy MAY expressly designate profiles as alternatives. Such designation MUST identify the alternative set and the applicable selection rule.
+
+Profiles applying to different properties or non-overlapping scopes MUST NOT be treated as conflicting solely because they apply to the same SLC realization.
+
+Where cumulative requirements within overlapping scope are incompatible or cannot be jointly evaluated, the affected assurance result MUST be `INDETERMINATE` until resolved by the authority responsible for the applicable contract or policy.
+
+No profile may silently override, weaken, or waive an EABC requirement or another applicable profile requirement.
+
+---
+
+## 5. EBP conformance eligibility and validity
+
+### 5.1 Separation of gates
+
+EBP conformance eligibility remains a separate gate.
+
+The existing logical expressions are retained:
 
 ```
 CONFORMANCE_ELIGIBLE(i, c, t) :=
@@ -122,129 +335,306 @@ VALID_COMMIT(a, i, c, t) :=
     CONFORMANCE_ELIGIBLE(i, c, t)
     ∧ FINAL_AUTHORITY_CHECK(a, c, t)
     ∧ COMMIT_CONDITIONS(a, c, t)
-
 ```
 
-These are **three parallel gates** and MUST NOT be merged into one another. In particular, `FINAL_AUTHORITY_CHECK`(Core, `docs/003`) keeps its existing scope — authority validity only. It MUST NOT be extended to also carry conformance-status logic; conformance is evaluated as an independent precondition to `VALID_COMMIT`, not as an additional clause inside `FINAL_AUTHORITY_CHECK`'s own checklist.
+Where:
 
-### 3.2 Conformance Validity Precondition (locked invariant)
+- `i` identifies the assessed implementation instance;
+- `c` identifies the applicable contract or policy context; and
+- `t` identifies the relevant assessment or evaluation time.
 
-Conformance status is tri-state: `VALID | INVALID | INDETERMINATE`.
+The three gates MUST NOT be merged.
 
-For the purposes of `VALID_COMMIT`, **`INDETERMINATE` is treated as `INVALID`** — it is never a third acceptable outcome. Deployment or availability policy MUST NOT redefine `INDETERMINATE` as `VALID`; doing so would reopen a fail-open loophole this invariant exists to close.
+In particular, `FINAL_AUTHORITY_CHECK` retains its EABC 003 scope. It MUST NOT be extended to carry EBP conformance-status logic.
 
-Conformance status is the composition of three independent validity dimensions:
+Conformance establishes whether the execution-boundary implementation is eligible to serve the contract. It is not itself an authority decision and is not folded into `FINAL_AUTHORITY_CHECK`.
 
-- **Temporal validity** (is the attestation within its stated validity window)
-- **Status / revocation** (has the attestation been revoked)
-- **Instance / state freshness** (does the attestation still describe the instance as it currently is)
+### 5.2 EBP assessment outcomes
 
-Composition rule — **most-restrictive-wins**, not averaging:
+EBP conformance status remains tri-state:
 
-```
-CONFORMANCE_STATUS :=
-    INVALID        if any dimension is INVALID
-    INDETERMINATE  else if any dimension is INDETERMINATE
-    VALID          otherwise
+- `VALID`
+- `INVALID`
+- `INDETERMINATE`
 
-```
+For the purposes of `VALID_COMMIT`, `INDETERMINATE` is unacceptable and is treated as `INVALID`.
 
-This mirrors the same shape used elsewhere in the architecture for POISON-overrides-VALID composition (see `[[sif-slc-architecture]]`'s Fabric Shadow Domain).
+A missing or unresolved required profile, insufficient evidence, unresolved validity condition, or unresolved material change MUST NOT be treated as `VALID`.
 
-### 3.3 Availability is explicitly out of scope for semantics
+The most restrictive applicable result governs. An assessment MUST NOT report `VALID` where a required dimension remains `INDETERMINATE` or `INVALID`.
 
-A deployment MAY use caching, redundancy, or staged rollout to reduce how often `INDETERMINATE` is observed in practice. It MUST NOT use these mechanisms to change what `INDETERMINATE` *means*. This document does not resolve the pre-existing `NON_BYPASSABILITY(B,E)`-vs-Availability ("blast radius") tension tracked in `[[sif-slc-architecture]]`; EBP states the requirement, availability engineering remains a deployment/SIF concern. The historical reference `EBP-006:Exclusivity@v1` denotes this same path-exclusion property.
+### 5.3 Validity dimensions
 
-## 4. Conformance Attestation
+The EBP validity assessment MUST preserve the distinction between:
 
-EBP introduces **no new cryptographic or attestation primitive**. Conformance Attestation is defined as an **EAT-based EABC Conformance Attestation Profile**: it reuses IETF EAT (RFC 9711, RATS WG) as the base entity/state claim-set format, and layers EBP-specific claims on top:
+1. temporal validity;
+2. status and revocation validity; and
+3. assessed-instance and relevant-state freshness/binding.
 
-- `contract_ref` — identifies the `ExecutionBoundaryContract` this attestation is claiming conformance against
-- `required_boundary_properties` — the property set (§2) being claimed
-- `status` — the tri-state value from §3.2, as claimed by the attesting party (subject to independent Validity evaluation by the relying party — a claimed `VALID` is not authoritative on its own)
+Each applicable dimension MUST be supported by evidence.
 
-This choice is consistent with the already-locked layer stack for the broader architecture: Hardware root → Attestation (TRACE) → Identity/governance layer → EABC execution-authority boundary. EAT was already flagged as a candidate composable input during prior-art research (see `[[omwei-eabc]]`'s prior-art section); this document is the first place it is adopted normatively.
+A validity period alone does not establish that the currently running instance is the instance assessed. Where instance identity is material to a claimed property, the assessment MUST establish the required binding between the assessment evidence and the running instance.
 
-### 4.1 Freshness, temporal validity, and revocation are independent
+EBP does not prescribe a universal binding mechanism. The mechanism is implementation- and profile-dependent, provided it establishes the required guarantee.
 
-These three are independent dimensions and MUST be evidenced independently (same discipline as Core's `authority_epoch` / `STALE_EPOCH` distinction, `docs/005`). In particular:
+### 5.4 Absence of profile obligations and the eligibility gate
 
-- `valid_until` alone does not prove that the *currently running* instance is the one that was attested. A binding mechanism between attestation and running instance is required wherever instance identity is structurally load-bearing for a claimed property — but EBP does not mandate *which* binding mechanism (static/deployment-time, challenge-response, or continuously-maintained trusted state); that choice is implementation/profile-dependent.
-- **Fresh Attestation ≠ `NON_BYPASSABILITY(B,E)`.** A freshly and validly attested instance can still sit behind a bypassable deployment topology. Freshness and non-bypassability are distinct properties and require separate evidence; attestation freshness does not substitute for either deployment-topology completeness evidence or boundary-mediation evidence.
-- **Implementation Identity ≠ `NON_BYPASSABILITY(B,E)`.** Knowing precisely which software/hardware is running (identity) does not by itself establish that the in-scope path inventory is complete or that every identified path is mediated by the boundary. Implementation identity does not substitute for either evidence aspect.
+The absence of an EBP profile obligation MUST NOT, by itself, be treated as a positive eligibility result.
 
-## 5. Conformance Evidence (a new, instance-scoped evidence class)
+Where the EBP gate is invoked, `ACCEPTABLE_CONFORMANCE_EVIDENCE` and `CONFORMANCE_VALIDITY_POLICY_SATISFIED` MUST each be evaluated under the applicable contract and validity policy.
 
-Core (`docs/002`) defines eight evidence categories, all **transaction-scoped**: Identity, Decision, Context, State, Commit, Execution, Correlation, Integrity.
+The policy MUST make clear what evidence and validity conditions are sufficient where no additional EBP profile is imposed.
 
-**Conformance Evidence is instance-scoped**, not transaction-scoped, and is therefore **not** folded in as a ninth member of that list. It is a separate evidence class, parallel to Core's eight, introduced specifically by EBP.
+This document does not redefine either predicate or declare that an empty profile set automatically satisfies the gate.
 
-### 5.1 Boundary Evidence Binding (new invariant, classified EXTEND)
+A profile-applicability determination MUST be based on the complete set of authoritative requirements applicable to the declared contract and assessment scope.
 
-Core's Evidence Correlation category already establishes the "Intrinsically Bound" principle (`docs/002`): *correlation without intrinsic integrity protection describes a relationship, but does not prove it.*
+The determination MUST identify the sources examined and the basis for concluding that no additional EBP profile obligation applies.
 
-EBP extends this principle directly: any reference from transaction-scoped Execution or Commit Evidence to instance-scoped Conformance Evidence must itself be **intrinsically bound** — a bare pointer or label referencing a conformance record is not sufficient; the binding must carry its own integrity protection, exactly as Core already requires for correlation between transaction-scoped evidence categories.
+Absence of a profile reference in an incomplete, unidentified, or non-authoritative policy source MUST NOT establish that no profile obligation applies.
 
-This is classified as an **extension** of an existing Core mechanism, not a new one.
+The profile-applicability determination is an assessment record, not a separate EBP conformance status.
 
-### 5.2 Missing-evidence handling (mirrors Core exactly)
+It MUST NOT independently establish `CONFORMANCE_ELIGIBLE` or replace either predicate in the existing eligibility expression.
 
-Core already states that missing evidence must never be interpreted as successful execution. EBP states the direct analogue:
+---
 
-> Missing or indeterminate Conformance Evidence SHALL NOT be interpreted as VALID conformance.
+## 6. EBP assurance evidence and attestation
 
-## 6. Two previously-undefined nodes, resolved
+### 6.1 EBP Assurance Evidence
 
-- **Execution Boundary Policy** — external, customer- or deployment-supplied input specifying which Required Boundary Properties apply to a given deployment. This is explicitly **not** an EABC/EBP primitive; it is an external input that feeds the Contract from outside the object tree defined by this document.
-- **Boundary Binding** — the deployment/configuration-time act of associating a specific implementation instance with a specific `ExecutionBoundaryContract`, establishing that instance's `boundary_id`. Boundary Binding is a distinct event from `FINAL_AUTHORITY_CHECK`'s runtime admission decision and from `COMMIT` itself:
+EBP Assurance Evidence is scoped to the assessed realization and its deployment.
 
-```
-BIND  ≠  ADMIT  ≠  COMMIT
+It is distinct from transaction-scoped EABC evidence.
 
-```
+EBP Assurance Evidence MUST identify, as applicable:
 
-(`ADMIT` here denotes `FINAL_AUTHORITY_CHECK`'s runtime outcome, per Core.) No new runtime state named `ADMITTED` is introduced by this document.
+- the assessed SLC implementation;
+- the substrate and relevant components;
+- configuration and deployment assumptions;
+- the applicable EBP profiles and versions;
+- the adversary model and guarantee;
+- the assessment method and result;
+- evidence supporting each applicable assurance constraint;
+- validity and revocation information; and
+- material changes affecting the assessment.
 
-## 7. Locked Core ↔ EBP Crosswalk (normative, 13 elements)
+EBP Assurance Evidence does not become an additional transaction-scoped EABC evidence category.
 
-| #ElementClassification |                                                                 |                                                                   |
-| ---------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------- |
-| 1                      | Required Boundary Properties                                    | NEW                                                               |
-| 2                      | Boundary Binding                                                | NEW                                                               |
-| 3                      | Conformance Assessment                                          | NEW                                                               |
-| 4                      | Conformance Evidence (as a class)                               | NEW                                                               |
-| 5                      | Conformance Status / tri-state gate                             | NEW                                                               |
-| 6                      | Boundary Evidence Binding                                       | EXTEND (reuses Core's Evidence Correlation / Intrinsically Bound) |
-| 7                      | Authority Conditions                                            | REUSE                                                             |
-| 8                      | Boundary Conditions                                             | REUSE                                                             |
-| 9                      | Commit Conditions                                               | REUSE                                                             |
-| 10                     | `FINAL_AUTHORITY_CHECK` (scope narrowed to exclude conformance) | REUSE                                                             |
-| 11                     | `COMMIT`                                                        | REUSE                                                             |
-| 12                     | `EFFECT`                                                        | REUSE                                                             |
-| 13                     | `ExecutionBoundaryContract`'s per-commit sections generally     | REUSE                                                             |
-| —                      | `ExecutionBoundaryPolicy`                                       | EXTERNAL INPUT (deliberately outside the EBP object tree)         |
+### 6.2 Boundary Evidence Binding
 
-Note on #7–#9: Boundary Conditions in particular reuse Core exactly as much as Authority and Commit Conditions do — `boundary_id matches` corresponds to Core's Context Binding property plus Context Evidence, and `target state current` corresponds to Core's State Binding property plus State Evidence. This is stated explicitly to remove an earlier, unjustified asymmetry under which Boundary Conditions had been informally treated as "more novel" than the other two per-commit condition sets.
+Where an identifier correlates transaction-scoped EABC evidence with instance-scoped EBP Assurance Evidence, that identifier MUST be covered by the same Integrity Evidence that protects the evidence artifact in which it appears.
 
-This crosswalk confirms the document's overall thesis numerically: EBP adds one new contract section within `ExecutionBoundaryContract` (§2) plus one new semantic plane (the conformance plane, §3–§5), and reuses or extends Core everywhere else. (Earlier draft language described this as "one new top-level object" — corrected: §2 is a new *section of*the existing `ExecutionBoundaryContract` object, per §1's own framing, not a new top-level object in its own right.)
+Correlation MUST NOT depend on an external mapping, index, or side channel that is not itself integrity-protected as part of the evidence artifact it correlates.
 
-## 8. Open Items
+A consumer MUST be able to verify provenance and correlation directly from the protected evidence artifacts, without relying on a separately maintained and separately trusted correlation record.
 
-- **§5 ↔ `docs/002` verification (not yet performed):** confirm that Core's Evidence Correlation category and its "Intrinsically Bound" principle carry exactly the normative force §5.1 attributes to them before treating Boundary Evidence Binding as a settled EXTEND. If `docs/002`'s actual language is narrower than assumed here, §5.1 needs to be re-scoped to match, not the other way around.
-- **§7 ↔ `docs/002` + `docs/004` verification (not yet performed):** re-check the NEW/EXTEND/REUSE classification in the 13-element crosswalk against both documents directly, specifically to rule out any hidden duplication between EBP's conformance plane and Core's existing Property/Evidence/Profile conformance levels (`docs/004`). Until this is done, treat the crosswalk as internally consistent but not yet cross-validated against Core's actual text.
-- Full clause-by-clause cross-check against `docs/002` (evidence model) and `docs/004` (conformance levels) has not yet been performed for this document specifically — the eight-vs-nine-category distinction in §5 was verified against actual repo content during drafting, but the interaction between EBP's conformance levels and Core's existing Property/Evidence/Profile conformance levels (`docs/004`) is not yet written up.
-- No implementation profile yet references EBP (EGA/SIF v1, `profiles/ega-sif-v1.md`, predates this document).
-- Binding mechanism for instance identity (§4.1) is deliberately left open; a future profile document may wish to recommend one without making it normative at the EBP level.
-- **Threat-model authorship and approval (proposed, not yet reviewed):** §2.2 requires the threat model to be stated but does not specify who authors it, who signs it, or who approves changes. §6 leaves Execution Boundary Policy to an external, deployment-supplied input. Open: whether the conformance record should identify a named, accountable threat-model author and an independent countersigner.
-- **Definition of material change (proposed, not yet reviewed):** §3 triggers Assessment on "each material change to i" without defining material change. Open: which changes require reassessment and how the permitted exceptions are recorded.
-- **Crosswalk classification (proposed, not yet reviewed):** decide later whether any elements arising from the proposed threat-model governance or material-change rules are NEW, EXTEND, or REUSE; no elements are added to the locked §7 crosswalk by this proposal.
+This requirement applies the existing EABC 002 Intrinsically Bound principle to the relationship between transaction-scoped EABC evidence and instance-scoped EBP Assurance Evidence.
 
-### Proposed direction (not normative)
+It does not create an additional EABC transaction evidence category.
 
-The following directions are proposed, not yet reviewed. They do not change the normative requirements or locked invariants above.
+### 6.3 Evidence reuse
 
-**Threat-model authorship and approval (proposed, not yet reviewed).** The conformance record would be INVALID if it lacks (a) a named, accountable author of the threat model and (b) an independent countersigner. A threat-model change would not become effective until countersigned. Independence would mean that the author and approver do not share a reporting line with the party that ships the implementation. This is the organizational analogue of the Independence property in §2.
+A single evidence item MAY support more than one requirement.
 
-**Material change (proposed, not yet reviewed).** Rather than attempting an exhaustive definition of material change, the conformance record would enumerate changes permitted without reassessment. Every other change would be material by default. An undefined change would fall under the existing tri-state rule in §3.2 and be treated as INVALID or INDETERMINATE, never VALID.
+It MUST independently establish each requirement's own normative meaning.
 
-**Enforcement limitation.** The specification cannot create a red team, allocate its budget, or enforce organizational reporting lines. It can only make the conformance record invalid when the required authorship or countersignature fields are missing. Whether the organizational independence is genuine remains an assurance and governance question.
+Evidence supporting an EBP assurance constraint MUST NOT automatically be treated as evidence satisfying an EABC property, and evidence satisfying an EABC property MUST NOT automatically establish an EBP assurance constraint.
+
+### 6.4 EBP Assurance Attestation
+
+An EBP Assurance Attestation MAY package claims about the assessed realization and its assurance status.
+
+It is optional unless required by an applicable contract or profile.
+
+An attestation:
+
+- is a structured claim about an assessment;
+- does not itself prove the truth of the claims;
+- does not replace the underlying evidence;
+- does not make a claimed `VALID` status authoritative without validity evaluation; and
+- MUST be bound to the assessed realization and applicable assessment record.
+
+EBP introduces no new cryptographic or attestation primitive. An EAT-based representation MAY be used where appropriate, but the format does not establish conformance by itself.
+
+### 6.5 Assessor and acceptance
+
+This document does not impose a universal assessor-independence or countersignature requirement.
+
+Transparent implementer-performed assessment and self-accepted N/A remain subject to the accepted EABC 004 and A1 rules.
+
+Any additional assessor qualification or third-party review requirement MUST be stated by the applicable contract or profile. It MUST NOT be inferred from the unqualified word "independent".
+
+---
+
+## 7. Relationship to Execution Boundary Policy and SLC architecture
+
+### 7.1 Execution Boundary Policy
+
+Execution Boundary Policy is an external input that identifies the applicable EBP assurance requirements for a deployment.
+
+It MUST NOT select or waive the five EABC boundary semantic properties.
+
+All five properties remain assessment subjects under EABC 004, subject only to the accepted N/A rules.
+
+### 7.2 SLC realization
+
+The SLC implementation is the enforcement realization being assessed.
+
+The architecture determines the substrate and the mechanisms used to implement the required enforcement behavior.
+
+EBP does not choose between software, TEE, MCU, Secure Element, FPGA, ASIC, ISA/pipeline, or hybrid architectures.
+
+### 7.3 Assessment
+
+The assessment evaluates whether the concrete realization satisfies:
+
+1. all applicable EABC normative requirements;
+2. all five EABC boundary semantic properties, with accepted N/A dispositions only where permitted;
+3. every applicable EBP profile and assurance constraint;
+4. the declared adversary model and guarantee; and
+5. the validity and deployment assumptions on which the assurance claim depends.
+
+An assessment result for one layer MUST NOT be substituted for a result required by another layer.
+
+---
+
+## 8. Relationship to EABC conformance levels
+
+EABC conformance levels remain defined by EABC 004.
+
+The existing hierarchy is preserved:
+
+- Level 1 — Property Conformance;
+- Level 2 — Evidence Conformance; and
+- Level 3 — Profile Conformance.
+
+EBP assurance tiers are separate from these EABC conformance levels.
+
+In particular:
+
+- EBP assurance tiers MUST NOT determine EABC conformance levels.
+- EBP assurance tiers MUST NOT replace an EABC property assessment.
+- EBP assurance tiers MUST NOT be treated as proof that an EABC semantic property is satisfied.
+- EABC conformance MUST NOT be inferred from an EBP assurance tier.
+- A claim of Full Level 1 MUST continue to satisfy EABC 004, including assessment of all five boundary semantic properties and the applicable P1–P10 obligations.
+
+The `ENFORCEMENT_INDEPENDENCE` qualification required for `NON_BYPASSABILITY` remains a separate EBP assurance qualification. It does not make EABC Level 1 dependent on a particular EBP assurance tier.
+
+---
+
+## 9. Compatibility and migration
+
+### 9.1 EABC semantic authority
+
+This document is subordinate to EABC 001–004 and the accepted authority decisions R1, A1, and A2.
+
+Nothing in this document amends those decisions.
+
+Where a conflict is identified, the applicable EABC normative text and accepted authority decisions govern. The conflict MUST be recorded for resolution rather than silently resolved by an EBP profile.
+
+### 9.2 EBP-006 legacy terminology
+
+The historical EBP-006 `Exclusivity` path-exclusion meaning is identified by the versioned alias:
+
+`EBP-006:Exclusivity@v1` → `NON_BYPASSABILITY(B,E)`
+
+The legacy alias MUST NOT be silently redefined as the authority-based `EXCLUSIVITY(A,E,I)`.
+
+The historical EBP-006 `Independence` label is reconciled to the qualified assurance meaning `ENFORCEMENT_INDEPENDENCE`. Its underlying assurance meaning is retained unless expressly amended by the applicable specification authority.
+
+### 9.3 Existing records
+
+Historical EBP assessments and evidence records MUST retain their original profile version, terminology, and assessment meaning.
+
+A migration MUST NOT silently reinterpret a historical `VALID`, `INVALID`, or `INDETERMINATE` result under a later profile version.
+
+Where an old assessment is mapped to this version, the mapping MUST identify:
+
+- the original profile and version;
+- the original claim and terminology;
+- the new profile and version, if applicable;
+- the mapping rationale; and
+- any gap requiring reassessment.
+
+### 9.4 Material changes
+
+A material change to the assessed SLC, substrate, configuration, deployment assumptions, adversary model, or applicable profile MUST trigger reassessment of affected claims.
+
+A previously valid assessment MUST NOT automatically remain valid after a material change.
+
+Where materiality or its effect on the guarantee cannot be determined, the affected assurance result MUST be `INDETERMINATE` until resolved.
+
+---
+
+## 10. Core-to-EBP relationship summary
+
+| EABC / EBP subject | EBP treatment |
+|---|---|
+| P1–P10 | Retained as EABC normative obligations; EBP does not replace them |
+| Five boundary semantic properties | All remain EABC assessment subjects; profiles may qualify assurance |
+| `NON_BYPASSABILITY` | Requires declared `ENFORCEMENT_INDEPENDENCE` qualification under R1 |
+| P3 deterministic commit semantics | Remains EABC; temporal constraints qualify but do not replace it |
+| `INTEGRITY_STATE` | Authenticity and integrity remain distinct from freshness |
+| P5 intended-state correspondence | Remains independently assessable; not inferred from state integrity |
+| EABC transaction evidence | Remains governed by EABC 002 |
+| EBP Assurance Evidence | Instance-/assessment-scoped; not a ninth transaction evidence category |
+| EABC conformance levels | Remain governed by EABC 004 |
+| EBP assurance tiers | Separate from EABC conformance levels |
+| Execution Boundary Policy | External input selecting applicable EBP assurance requirements, not EABC properties |
+| SLC substrate | Chosen by implementation architecture and assessed as part of the concrete realization |
+| EBP Assurance Attestation | Optional packaging of claims; not proof by itself |
+
+---
+
+## 11. Authority decisions and remaining open items
+
+### 11.1 Accepted Authority decisions
+
+The EABC Specification Authority has accepted the following design positions as part of EBP v0.2.3:
+
+1. Multiple applicable EBP profiles are cumulative by default within overlapping assessment scope.
+2. Alternative profile selection requires explicit authorization by the applicable contract or policy.
+3. Absence of an additional EBP profile obligation does not automatically establish `CONFORMANCE_ELIGIBLE`.
+4. EBP does not establish a universal assurance-tier hierarchy across profile families.
+5. Boundary Evidence Binding follows the EABC 002 Intrinsically Bound principle.
+6. P3 remains an EABC obligation and is not an additional value of the EBP `property` field.
+7. The historical EBP-006 `Independence` meaning is retained while its terminology is aligned with `ENFORCEMENT_INDEPENDENCE`.
+
+### 11.2 Remaining open items
+
+The following matters remain open for Authority review:
+
+1. **Attestation format:** whether an EAT-based representation should be standardized as a recommended profile or remain optional.
+2. **Material-change criteria:** whether common material-change categories should be standardized beyond the requirement to reassess changes affecting a claimed guarantee.
+
+These open items MUST NOT weaken existing EABC requirements or alter the accepted separation between EABC conformance and EBP assurance.
+
+---
+
+## 12. Normative invariants
+
+The following invariants govern interpretation of this document:
+
+1. EBP MUST NOT define or select the SLC substrate.
+2. The concrete SLC realization MUST be assessed with its substrate, configuration, and deployment assumptions.
+3. EBP MUST NOT create, waive, or select away EABC properties.
+4. All five EABC boundary semantic properties remain assessment subjects under EABC 004.
+5. EBP profiles MUST qualify, not redefine, EABC properties.
+6. P3 remains an EABC semantic obligation; temporal assurance constraints MUST NOT replace it.
+7. P3 MUST NOT be introduced as an additional EBP `property` value.
+8. `INTEGRITY_STATE` MUST NOT be treated as proof of freshness.
+9. `INTEGRITY_CTX` provenance MUST NOT be treated as proof of factual correctness.
+10. `NON_BYPASSABILITY` MUST declare the applicable `ENFORCEMENT_INDEPENDENCE` qualification.
+11. EABC conformance levels and EBP assurance tiers MUST remain separate.
+12. Missing or unresolved required profile selection MUST NOT be treated as absence of a profile obligation.
+13. Absence of a profile obligation MUST NOT automatically establish `CONFORMANCE_ELIGIBLE`.
+14. `INDETERMINATE` MUST remain unacceptable for `VALID_COMMIT`.
+15. EBP Assurance Evidence MUST remain distinct from transaction-scoped EABC evidence.
+16. No EBP assurance result or attestation may substitute for the evidence required to establish the underlying claim.
+17. Multiple applicable EBP profiles are cumulative by default within overlapping assessment scope.
+18. Alternative profile selection MUST be expressly authorized by the applicable contract or policy.
+19. Unresolved conflicts between applicable profile requirements MUST result in `INDETERMINATE`.
+20. EBP MUST NOT establish a universal assurance-tier hierarchy across profile families.
+21. A profile-applicability determination MUST identify the authoritative sources examined and the declared assessment scope.
+22. Correlation between EABC transaction evidence and EBP Assurance Evidence MUST satisfy the EABC 002 Intrinsically Bound principle.
