@@ -1,4 +1,11 @@
 # External Observation — AgenTrust cMCP PR #740: Execution-Scope Path Sets
+**Evidence metadata**
+
+- `record_type`: `observation`
+- `evidence_state`: `declared`
+- `reproduction_state`: `source-only`
+- `realization`: `not-established` — no immutable EBP §1.4 realization description is currently linked to this record.
+
 
 **Evidence status:** Merged documentation change; source and review discussion inspected through GitHub  
 **Repository:** [agentrust-io/cMCP](https://github.com/agentrust-io/cMCP)  
