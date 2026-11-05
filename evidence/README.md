@@ -75,6 +75,20 @@ It MUST identify the relevant versions or immutable identities of the tuple elem
 
 The evidence state and reproduction state are independent dimensions. In particular, `reported` does not mean that artifacts are absent, and `reproducible-from-record` does not by itself promote a finding to `demonstrated`.
 
+## Record classification snapshot
+
+| Record | `record_type` | `evidence_state` | `reproduction_state` | Scope note |
+|---|---|---|---|---|
+| HALOS Runs 002/003 | `run` | `demonstrated` | `reproducible-from-record` | Mediation demonstrated for tested GIE path; path-set completeness not established |
+| ComOS Node 1.0.59 | `observation` | `reported` | `artifacts-missing` | Maintainer-reported observations; run JSON and script unavailable here |
+| AgenTrust cMCP PR #740 | `observation` | `declared` | `source-only` | Source/documentation review and synthetic probes; no real order-effect test |
+| GR00T SO100/SO101 | `observation` | `reported` | `reproducible-from-record` | Harness and CI evidence recorded; independent verification not claimed |
+| Validation Run 001 | `run` | `reported` | `source-only` | Source journal entries supplied; hash recomputation documented, original live run not independently rerun |
+| Validation Run 002 | `plan` | `declared` | `source-only` | Planned experiment; not executed |
+| GR00T recording-transport test plan | `plan` | `declared` | `source-only` | Plan only; execution results are recorded in the GR00T observation |
+
+The metadata is a conservative snapshot of the records at this revision. It does not replace each record's detailed scope, provenance, or limitations.
+
 ## Current evidence status
 
 At baseline commit `2fdfe46d76222e17724636fcf071a632d3f4f45b`, no evidence record in this directory supports a `VALID` outcome under EBP §5.2 for `NON_BYPASSABILITY`.
