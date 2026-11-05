@@ -3,7 +3,7 @@
 **Evidence metadata**
 
 - `record_type`: `run`
-- `evidence_state`: `demonstrated`
+- `evidence_state`: `reported`
 - `reproduction_state`: `reproducible-from-record`
 - `realization`: `not-established` — no immutable EBP §1.4 realization description is currently linked to this record.
 
@@ -84,7 +84,7 @@ Its execution evidence records PREPARE, FINAL_AUTHORITY_CHECK, and EXECUTION/COM
 
 **Tested path:** the HALOS/GIE governed execution path exercised by Runs 002 and 003.
 
-**Evidence state:** `DEMONSTRATED` for the tested path. The control pair demonstrates that the revoked-before-commit case blocks the relay state change while the unchanged-authority control permits it.
+**Observation reported by the preserved run:** the revoked-before-commit case blocks the relay state change while the unchanged-authority control permits it. The artifacts and CI anchors are preserved, but this record does not document independent reproduction or independent semantic verification of the observation. Under the evidence-state definition, the finding therefore remains `REPORTED` until that verification is recorded.
 
 **Path-set completeness:** `NOT ESTABLISHED`. This record does not enumerate every path capable of changing the relay state.
 
