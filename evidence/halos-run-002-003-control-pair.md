@@ -1,5 +1,12 @@
 # HALOS Prepare / Commit Control Pair — Runs 002 and 003
 
+**Evidence metadata**
+
+- `record_type`: `run`
+- `evidence_state`: `reported`
+- `reproduction_state`: `reproducible-from-record`
+- `realization`: `not-established` — no immutable EBP §1.4 realization description is currently linked to this record.
+
 > **Disambiguation:** This HALOS/GIE single-implementation control pair is distinct from the cross-organization prepare/authority-change plan in [validation-run-002-plan.md](./validation-run-002-plan.md).
 
 **Status:** Implementation evidence  
@@ -71,7 +78,19 @@ Run 003 uses:
 
 Its execution evidence records PREPARE, FINAL_AUTHORITY_CHECK, and EXECUTION/COMMITTED.
 
-## 3. Paired interpretation
+## 3. Protected Effect and path scope
+
+**Protected Effect:** the relay changing state.
+
+**Tested path:** the HALOS/GIE governed execution path exercised by Runs 002 and 003.
+
+**Observation reported by the preserved run:** the revoked-before-commit case blocks the relay state change while the unchanged-authority control permits it. The artifacts and CI anchors are preserved, but this record does not document independent reproduction or independent semantic verification of the observation. Under the evidence-state definition, the finding therefore remains `REPORTED` until that verification is recorded.
+
+**Path-set completeness:** `NOT ESTABLISHED`. This record does not enumerate every path capable of changing the relay state.
+
+The Protected Effect is not narrowed to the implementation or to the GIE path. The pair provides reported evidence of mediation on the tested path; it does not establish `NON_BYPASSABILITY(B,E)` across all paths capable of producing the Protected Effect.
+
+## 4. Paired interpretation
 
 The important observation is the controlled difference between the two runs:
 
@@ -91,7 +110,7 @@ The pair therefore provides implementation evidence for the following bounded ob
 
 This is evidence of observed behavior in the tested implementation. It is not, by itself, an exhaustive validation of all possible authority transitions, verifier failures, or execution failure modes.
 
-## 4. Integrity and provenance
+## 5. Integrity and provenance
 
 Run 003 was committed to the HALOS repository and published through CI.
 
@@ -117,7 +136,7 @@ The SHA-256 value was independently checked against the generated Run 003 eviden
 
 Run 002 remains the existing reference baseline and its CI publication was preserved unchanged.
 
-## 5. EABC evidence-model mapping
+## 6. EABC evidence-model mapping
 
 The pair exercises several existing evidence concepts:
 
@@ -132,7 +151,7 @@ These are observations against the existing EABC evidence model. The HALOS imple
 
 In particular, `STALE_EPOCH` is recorded as an implementation-side reason. It is not introduced as a new EABC authorization outcome.
 
-## 6. What this evidence establishes
+## 7. What this evidence establishes
 
 Within the tested HALOS/GIE implementation:
 
@@ -145,7 +164,7 @@ Within the tested HALOS/GIE implementation:
 7. the two cases use the same governed execution path and payload;
 8. the evidence artifacts are published independently through CI.
 
-## 7. What this evidence does not establish
+## 8. What this evidence does not establish
 
 This pair does **not** establish:
 
@@ -160,7 +179,7 @@ This pair does **not** establish:
 
 Missing or unobservable cases remain validation gaps rather than successful outcomes.
 
-## 8. Relationship to normative EABC
+## 9. Relationship to normative EABC
 
 This record is subordinate to the existing EABC specification and evidence model.
 
@@ -173,7 +192,7 @@ It does not modify:
 
 The purpose is to preserve concrete implementation evidence that can be independently inspected and compared with later evidence from other implementations.
 
-## 9. Reproduction anchors
+## 10. Reproduction anchors
 
 An independent reviewer can begin verification from:
 

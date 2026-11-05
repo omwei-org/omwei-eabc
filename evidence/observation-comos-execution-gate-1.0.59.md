@@ -1,4 +1,11 @@
 # External Observation — ComOS Node Execution Gate 1.0.59
+**Evidence metadata**
+
+- `record_type`: `observation`
+- `evidence_state`: `reported`
+- `reproduction_state`: `artifacts-missing`
+- `realization`: `not-established` — no immutable EBP §1.4 realization description is currently linked to this record.
+
 
 **Evidence status:** Reported by the ComOS maintainer; underlying run JSON and script have not yet been independently inspected in this repository  
 **Reported test date:** 2026-10-15  
