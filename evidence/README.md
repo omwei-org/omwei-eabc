@@ -79,7 +79,7 @@ The evidence state and reproduction state are independent dimensions. In particu
 
 | Record | `record_type` | `evidence_state` | `reproduction_state` | Scope note |
 |---|---|---|---|---|
-| HALOS Runs 002/003 | `run` | `demonstrated` | `reproducible-from-record` | Mediation demonstrated for tested GIE path; path-set completeness not established |
+| HALOS Runs 002/003 | `run` | `reported` | `reproducible-from-record` | Preserved control-pair artifacts report mediation on tested GIE path; independent semantic verification and path-set completeness not established |
 | ComOS Node 1.0.59 | `observation` | `reported` | `artifacts-missing` | Maintainer-reported observations; run JSON and script unavailable here |
 | AgenTrust cMCP PR #740 | `observation` | `declared` | `source-only` | Source/documentation review and synthetic probes; no real order-effect test |
 | GR00T SO100/SO101 | `observation` | `reported` | `reproducible-from-record` | Harness and CI evidence recorded; independent verification not claimed |
