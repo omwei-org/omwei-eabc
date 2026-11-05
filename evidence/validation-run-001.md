@@ -1,4 +1,11 @@
 # Evidence Reference — Interoperability Validation Run 001
+**Evidence metadata**
+
+- `record_type`: `run`
+- `evidence_state`: `reported`
+- `reproduction_state`: `source-only`
+- `realization`: `not-established` — no immutable EBP §1.4 realization description is currently linked to this record.
+
 
 **Status:** Real validation record  
 **Date of observed run:** 2026-09-18  
