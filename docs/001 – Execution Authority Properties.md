@@ -890,7 +890,7 @@ This property has no direct whitepaper counterpart; it realizes, at the specific
 
 # 3. Terminology and separation from EBP assurance
 
-The term "independence" has three distinct meanings and MUST NOT be used without its qualifier in normative text:
+The qualified terms Authority-Origin Independence, Enforcement Independence, and Non-Parallelism MUST be used, without abbreviation, wherever one of these three meanings is intended. The unqualified word "independent" MUST NOT be used in normative text to denote any of these meanings. General-language uses (for example "third-party assessor") are not affected, provided the reference is determinable from context.
 
 | Term | Layer | Meaning |
 |---|---|---|
