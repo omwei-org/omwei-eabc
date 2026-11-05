@@ -1,3 +1,12 @@
+"""Evidence metadata
+record_type: script
+evidence_state: declared
+reproduction_state: source-only
+realization: not-established (no immutable EBP §1.4 realization description linked)
+
+This script is a test harness, not an observation record or conformance verdict.
+"""
+
 """Exercise the pinned LeRobot Feetech conversion/write path without hardware.
 
 This imports the real pinned MotorsBus and FeetechMotorsBus implementations.
