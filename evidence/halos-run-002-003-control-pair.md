@@ -1,5 +1,12 @@
 # HALOS Prepare / Commit Control Pair — Runs 002 and 003
 
+**Evidence metadata**
+
+- `record_type`: `run`
+- `evidence_state`: `demonstrated`
+- `reproduction_state`: `reproducible-from-record`
+- `realization`: `not-established` — no immutable EBP §1.4 realization description is currently linked to this record.
+
 > **Disambiguation:** This HALOS/GIE single-implementation control pair is distinct from the cross-organization prepare/authority-change plan in [validation-run-002-plan.md](./validation-run-002-plan.md).
 
 **Status:** Implementation evidence  
@@ -71,7 +78,19 @@ Run 003 uses:
 
 Its execution evidence records PREPARE, FINAL_AUTHORITY_CHECK, and EXECUTION/COMMITTED.
 
-## 3. Paired interpretation
+## 3. Protected Effect and path scope
+
+**Protected Effect:** the relay changing state.
+
+**Tested path:** the HALOS/GIE governed execution path exercised by Runs 002 and 003.
+
+**Evidence state:** `DEMONSTRATED` for the tested path. The control pair demonstrates that the revoked-before-commit case blocks the relay state change while the unchanged-authority control permits it.
+
+**Path-set completeness:** `NOT ESTABLISHED`. This record does not enumerate every path capable of changing the relay state.
+
+The Protected Effect is not narrowed to the implementation or to the GIE path. The pair demonstrates mediation of the tested path, not `NON_BYPASSABILITY(B,E)` across all paths capable of producing the Protected Effect.
+
+## 4. Paired interpretation
 
 The important observation is the controlled difference between the two runs:
 
