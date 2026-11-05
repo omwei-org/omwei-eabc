@@ -1,4 +1,11 @@
 # GR00T SO100 — isolated pinned-driver reproduction plan
+**Evidence metadata**
+
+- `record_type`: `plan`
+- `evidence_state`: `declared`
+- `reproduction_state`: `source-only`
+- `realization`: `not-established` — no immutable EBP §1.4 realization description is currently linked to this record.
+
 
 ## Purpose
 
