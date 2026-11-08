@@ -134,7 +134,7 @@ These obligations MUST be assessed under P1's own normative meaning. They MUST N
 - `INTEGRITY_DEF(B)`, which concerns the applicable boundary definition;
 - `ENFORCEMENT_INDEPENDENCE`, which is an EBP assurance constraint and is not P1 Authority-Origin Independence.
 
-A valid authority request submitted by the governed system to an entitled authority originating from the required separate trust domain is not, by itself, self-authorization. The assessment must determine who actually creates or grants the authority and whether the grantor is entitled to do so.
+A valid authority request submitted by the governed system to an entitled authority whose trust domain satisfies P1's Authority-Origin Independence requirement is not, by itself, self-authorization. The assessment MUST determine who actually creates or grants the authority, the trust-domain relationship of that authority, and whether the grantor is entitled to grant the particular authority.
 
 ### 3.2 Interpretation constraints
 
@@ -146,6 +146,8 @@ The mapping MUST be applied with the following distinctions:
 - Revocation of a credential is not proof that an already accepted or in-flight operation has been cancelled. The effect and its commit semantics must be examined under P3 and the declared revocation semantics.
 - A software gateway's presence is not proof that every path is mediated. The topology-completeness and mediation evidence remain separate.
 - Evidence correlation (P7) is necessary to reconstruct distributed actions, but correlation alone does not prove that the actions were authorized or mediated.
+- P2 Complete Mediation and `NON_BYPASSABILITY(B,E)` are related but not interchangeable. The topology-completeness and boundary-mediation evidence dimensions support the boundary-level property; they do not automatically establish P2 in its entirety. P2 MUST still be assessed in its own normative meaning.
+- P3 Deterministic Commit Semantics remains a separate obligation. In particular, a valid context binding or a successful boundary decision does not establish check-to-effect atomicity. A state change or revocation between determination and effect MUST be considered under P3.
 
 ---
 
@@ -261,9 +263,11 @@ Each scenario below is a test pattern. An assessment record MUST instantiate it 
 
 **Evidence:** Authority/change provenance, revocation event, effective-time semantics, boundary state, in-flight operation records, commit/effect timestamps, and alternative-path inventory.
 
-**Failure indicator:** An effect that should be prohibited after the declared revocation-effective point is committed, or the evidence cannot determine whether the effect occurred before or after that point.
+**Failure indicator:** An effect is produced after a revocation or state change has invalidated the determination on which that effect relies; or the implementation permits a gap between determination and effect in which the applicable commit conditions can cease to hold without a new determination or other behavior required by P3. The evidence is insufficient if it cannot establish the ordering of revocation, determination, commit, and effect.
 
-**Qualification:** This scenario does not assume instantaneous revocation. Any maximum latency, freshness, or temporal condition must be declared as an applicable EBP assurance constraint and assessed separately from EABC semantics.
+**P3 qualification:** P3 requires deterministic commit semantics and check-to-effect atomicity. Where a revocation or state change invalidates the determination before the associated effect, P3 is directly relevant; this is not merely an EBP timing concern. If COMMIT and a subsequent external EFFECT are distinct stages, the assessment MUST examine the gap through the external effect.
+
+**EBP qualification:** Any separately selected maximum enforcement latency, freshness, or temporal-consistency requirement remains an EBP assurance constraint. It MUST NOT replace or weaken the P3 semantic obligation. This scenario does not assume instantaneous revocation; the applicable revocation semantics and effective transition MUST be declared.
 
 ### SA-07 — Self-modification or deployment mutation
 
@@ -299,7 +303,7 @@ Each scenario below is a test pattern. An assessment record MUST instantiate it 
 
 **Evidence:** Authority designation, candidate inventory and completeness method, decision dependencies, commit records, and effect records.
 
-**Failure indicator:** A Parallel Commit Authority exists within the same effect, scope, and interval. Mere existence of another agent or boundary is not sufficient to establish this failure.
+**Failure indicator:** A candidate satisfies the defined Parallel Commit Authority conditions for the same Protected Effect, scope, and Authority Interval. Mere existence of another agent, decision function, execution path, or boundary is not sufficient. A bypass path that produces E without mediation by B but does not introduce a Parallel Commit Authority is assessed as a `NON_BYPASSABILITY` failure only; where the bypass path also introduces a Parallel Commit Authority, both `NON_BYPASSABILITY` and `EXCLUSIVITY(A,E,I)` are implicated.
 
 ---
 
@@ -322,7 +326,7 @@ Each scenario below is a test pattern. An assessment record MUST instantiate it 
 
 **Failure indicator:** The governed execution domain creates or grants its own authority, causes a controlled component to do so on its behalf, or modifies established authority outside an authorized procedure.
 
-**Qualification:** A request from the agent to a properly entitled authority in a separate trust domain is not itself self-authorization. The assessment concerns the actual origin and control of the authority grant, not merely which component submitted the request.
+**Qualification:** A request from the agent to a properly entitled authority whose trust domain satisfies P1's Authority-Origin Independence requirement is not itself self-authorization. The assessment concerns the actual trust-domain origin and control of the authority grant, the grantor's entitlement, and whether the governed execution domain caused a component within or controlled by that domain to create or modify the authority on its behalf—not merely which component submitted the request.
 
 ## 5. Cross-boundary coverage assessment
 
