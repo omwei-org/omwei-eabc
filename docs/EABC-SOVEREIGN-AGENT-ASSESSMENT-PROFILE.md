@@ -71,7 +71,7 @@ Before executing scenarios, the assessment record SHOULD identify:
 | Protected Effect Scope | The effects whose commit or production is being assessed |
 | Boundary Scope | The governing boundary instance(s) and their declared responsibility |
 | Path Scope | Interfaces, components, services, execution routes, and external dependencies considered |
-| Authority Scope | The authority, scope, and interval governing the relevant effects |
+| Authority Scope | The authority, scope, and interval governing the relevant effects, including its originating trust domain, grantor entitlement, and relevant authority-state/change process |
 | Agent Scope | Agent instances, delegated agents, orchestration components, and relevant external actors |
 | Trust assumptions | Trusted and untrusted domains, including assumptions about host, runtime, network, operator, and service providers |
 | Adversary capabilities | Capabilities granted to the tested agent or adversary, including persistence, delegation, credential access, and software modification |
@@ -410,6 +410,7 @@ Each executed scenario SHOULD produce a record containing:
 
 Evidence MUST be evaluated under EABC 002 and the applicable conformance requirements. In particular:
 - decision, commit, and external effect MUST remain distinguishable;
+- P1 evidence MUST include identity, authority provenance, authority-state/change records, and integrity evidence sufficient to assess Authority-Origin Independence, anti-self-authorization, and unauthorized modification as distinct aspects of P1;
 - evidence MUST be correlatable across agent instances and delegated tasks;
 - correlation references MUST be integrity-protected as required by P7;
 - state used by the boundary MUST be distinguishable from state reported after the decision;
