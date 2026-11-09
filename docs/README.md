@@ -194,6 +194,25 @@ The first reference profile is:
 
 ---
 
+## Non-normative assessment profiles
+
+Assessment profiles and scenario catalogues are maintained separately from the normative EABC specification and from concrete implementation profiles.
+
+### Sovereign-agent assessment
+
+**Canonical profile:** [EABC Sovereign Agent Assessment Profile](EABC-SOVEREIGN-AGENT-ASSESSMENT-PROFILE.md)
+
+**Document ID:** `EABC-SAAP-001`  
+**Status:** Proposed — non-normative.
+
+This profile maps the seven sovereign-agent capability scenarios to existing EABC obligations and boundary semantic properties. It defines scope declarations, topology-completeness and mediation evidence, adversarial scenarios, test execution guidance, and bounded scenario dispositions (PASS / FAIL / INCONCLUSIVE).
+
+It does not introduce an EABC property, conformance level, EBP tier, authority model, or enforcement substrate. A scenario result is not an EABC conformance verdict and does not establish that an implementation conforms.
+
+The former `assessment-sovereign-agent-001.md` is retained only as a supersession pointer to the canonical profile; it is not a second profile.
+
+---
+
 # Design Philosophy
 
 EABC separates:
