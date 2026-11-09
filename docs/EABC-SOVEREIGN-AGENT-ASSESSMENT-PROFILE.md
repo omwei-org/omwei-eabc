@@ -439,6 +439,33 @@ A test that only demonstrates expected rejection, without showing that the obser
 
 ---
 
+### 6.5 Common execution procedure
+
+Before executing each scenario, the assessor MUST:
+
+1. **Define the effect:** identify the concrete externally meaningful Protected Effect E. Do not substitute an agent intention or vague objective for the effect itself.
+2. **Declare the boundary and scope:** identify B, E, Protected Effect Scope, Boundary Scope, Path Scope, Agent Scope, and the relevant Authority Scope / Authority Interval.
+3. **Model the adversary:** record the capabilities, footholds, privileges, collusion, trust assumptions, and capabilities actually exercised. A capability mentioned only in a narrative is not tested.
+4. **Establish topology completeness:** document the method used to identify all in-scope paths capable of producing E. A list of currently known paths without a completeness argument is insufficient.
+5. **Test mediation:** attempt the effect through every identified path, including alternate, delegated, direct, replay, recovery, administrative, asynchronous, and physical paths where they are in scope.
+6. **Test integrity and binding:** where relevant, attempt to alter or substitute the boundary definition, decision-relevant runtime state, context, or authority relationships.
+7. **Test commit/effect semantics:** distinguish request, authorization, determination, commit, and subsequent external effect. Record the applicable P3 and in-flight operation semantics.
+8. **Collect evidence:** preserve decision, state, context, commit, execution, correlation, and integrity evidence as applicable under EABC 002.
+9. **Record limitations:** identify untested paths, inaccessible systems, unverified vendor claims, simulator limitations, and assumptions explicitly.
+10. **Assign a scenario disposition:** use the bounded scenario vocabulary below. Do not convert it into an EABC conformance verdict.
+
+### 6.6 Scenario disposition
+
+Use these terms for the result of an individual scenario:
+
+- **PASS:** the declared scenario was executed, required evidence was collected, and the expected boundary behavior was demonstrated for the complete declared test scope.
+- **FAIL:** evidence demonstrates that an in-scope path produced or could produce the Protected Effect without the required boundary conditions, or that a required integrity, authority, or commit condition was violated.
+- **INCONCLUSIVE:** the assessment could not establish the claim, including because topology completeness, path access, evidence integrity, or deployment assumptions could not be verified.
+
+A PASS is limited to the declared realization, configuration, deployment assumptions, adversary model, Protected Effect Scope, and tested scenario. It is not proof of universal non-bypassability or global prevention of loss of control. A FAIL or INCONCLUSIVE disposition must identify the exact scope and evidence basis.
+
+These scenario dispositions are distinct from the property-level EABC assessment outcomes in Section 7. A scenario PASS does not automatically establish P1–P10 compliance, all five boundary semantic properties, any EABC conformance level, or an EBP assurance tier.
+
 ## 7. Assessment outcomes and claim boundaries
 
 ### 7.1 Property-level assessment
