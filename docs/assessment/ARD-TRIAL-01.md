@@ -24,6 +24,17 @@ No discovery run may begin until this preregistration is completed and explicitl
 
 The trial must use this exact methodology baseline. Any methodology change after preregistration requires a separately versioned amendment, an explanation of its effect on comparability, and an explicit decision whether the trial must restart.
 
+### 2.1 Baseline interpretation issue — disposition required before freeze
+
+The frozen ARD-001 v0.3 text contains a scope ambiguity that must be made explicit rather than silently edited during this trial:
+
+- Section 3 states the claim in terms of “every route capable of producing E”.
+- Sections 7 and 10 classify routes outside attacker model A as Out of scope and limit the verdict to the declared A.
+
+For Trial 1, the proposed operational interpretation is: **all candidate routes are retained and examined, but only routes available to an actor within the declared A are in-scope routes for the NON_BYPASSABILITY claim and verdict.** Routes outside A remain visible in the register and are classified Out of scope with a justification tied to A.
+
+This is an interpretation of the existing A-scoping structure, not a silent edit to the frozen baseline. The trial owner must explicitly accept this interpretation before preregistration freeze. If it is not accepted, the ambiguity must be resolved through a separately versioned ARD-001 amendment and a new baseline decision before Trial 1 starts.
+
 ## 3. Trial target and boundary
 
 **Target category:** Software commerce-agent node.  
@@ -70,9 +81,11 @@ Record unavailable artifact categories explicitly. Do not interpret absence of a
 
 The raw-artifact inventory is supplied to a discovery run whose task is to identify candidate routes and omitted/undocumented interfaces without relying on a pre-written route register.
 
+For a controlled comparison, this run must receive the same declared E, B, A and S, and refer to the same target version, as the declared-model run. The difference between the two discovery conditions is the representation of M: the raw-artifact condition receives the inventoried primary artifacts as its system evidence package; the declared-model condition receives the separately prepared M model and its provenance register. Do not give either run a pre-written route register, calibration ground truth, or held-out challenge answers. Record any unavoidable difference in context, access, token budget or other run conditions; such differences limit the strength of the comparison.
+
 ### 4.2 Declared-model discovery input
 
-Prepare a separate declared-model package containing E, B, A, M and S, plus the provenance register. Run the same discovery objective against this package.
+Prepare a separate declared-model package containing E, B, A, M and S, plus the provenance register. Run the same discovery objective against this package. The declared-model run must use the same E, B, A, S, target version, discovery objective and, as far as practicable, model/framing and resource conditions as its paired raw-artifact run. Only the representation of M should intentionally differ.
 
 ### 4.3 Comparison
 
@@ -173,6 +186,8 @@ Trial execution is blocked until every gate below is satisfied and recorded:
 - [ ] Raw-artifact inventory collected, versioned, and its gaps recorded.
 - [ ] Declared-model package and provenance register completed independently of raw-artifact discovery.
 - [ ] Raw/model input comparison plan confirmed.
+- [ ] Paired discovery inputs use identical E, B, A, S and target version; differences in M representation and any unavoidable run-condition differences are documented.
+- [ ] Trial owner explicitly accepts the A-scoping interpretation in Section 2.1, or resolves it through a separately versioned methodology amendment and new baseline decision.
 - [ ] Calibration set frozen and timestamped; confirmed bypasses separated from open challenge cases.
 - [ ] Availability or absence of confirmed-bypass ground truth documented.
 - [ ] N_min, K_route, K_class, diversity and counting rules explicitly set and justified.
