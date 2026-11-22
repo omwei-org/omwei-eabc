@@ -1,11 +1,11 @@
 # ARD-TRIAL-01 — Trial 1 Target Instance Specification (Browsa OSA)
 
-**Status:** PRELIMINARY — NOT FROZEN.  
+**Status:** PRELIMINARY — A/S OWNER DECISIONS RECORDED; NOT FROZEN.  
 **Assessment status:** NOT STARTED.  
 **Trial:** 1 — software commerce-agent node.  
 **Document type:** Non-normative companion specification to `ARD-TRIAL-01.md`.
 
-This document specifies a preliminary candidate target instance for Trial 1. It is not an assessment result, implementation validation, or conformance verdict. The attacker model and assessment scope remain subject to trial-owner review. This document does not freeze the preregistration or authorise any discovery run.
+This document specifies a preliminary candidate target instance for Trial 1. It is not an assessment result, implementation validation, or conformance verdict. The trial owner recorded acceptance of the attacker-model dispositions and evidence scope on 2026-11-22; see `ARD-TRIAL-01-BROWSA-A-S-OWNER-REVIEW.md`. The preregistration is not frozen and no discovery run is authorised.
 
 **Target:** Browsa Open Shopping Agent  
 **Repository:** `browsa-io/open-shopping-agent`  
@@ -37,17 +37,17 @@ The assessment must examine every route capable of producing E, not merely expli
 
 ### 5.3 Attacker Model (A)
 
-**Status: OPEN — pending trial-owner review and acceptance.**
+**Status: OWNER DECISIONS RECORDED — bounded A accepted for Trial 1 (2026-11-22).**
 
-The following are candidate attacker capabilities for consideration. Their inclusion here does not assert that each capability is achievable in the pinned implementation or any particular deployment.
+A describes adversarial capabilities available to an actor within the declared target/instance scope. Acceptance does not assert that a capability is unrestricted or that a corresponding route is exploitable in the pinned implementation. Each capability must be bounded by actual interfaces, permissions, principals and trust boundaries.
 
-- **A1 — Model compromise or manipulation:** The model produces actions contrary to the user's intended purchase constraints.
-- **A2 — MCP client manipulation:** Unexpected, repeated, malformed, or adversarial tool requests are submitted through the MCP interface.
-- **A3 — Malicious merchant-page content:** Page content attempts to influence browser-controlled AI tasks or alter checkout behaviour.
-- **A4 — Browser-session manipulation:** Browser state, page content, checkout totals, or browser control is manipulated between review and submission. This includes cases in which an AI-controlled browser task shares the same browser instance and page state as the checkout under review, as in a `sameBrowser: true` configuration.
-- **A5 — Adapter faults:** An adapter misidentifies checkout state, reads an incorrect total, or performs an unintended final action.
+- **A1 — Model compromise or manipulation: ACCEPT, bounded.** Treat model/agent output as adversarially influenceable, limited to actions reachable through actual tools and permissions. This does not imply unrestricted host or browser access.
+- **A2 — MCP client manipulation: ACCEPT, bounded.** Applies only if MCP is actually exposed in the target instance. Establish and record actual exposure, authentication and caller privileges; do not infer exposure from MCP code presence alone.
+- **A3 — Malicious merchant-page content: ACCEPT, bounded.** Treat page content as untrusted input that may influence agent/browser decisions; do not assume page content can directly invoke privileged operations.
+- **A4 — Browser/session manipulation: NARROW.** Include only manipulation through concrete, demonstrable in-scope interfaces/control paths and permissions. `sameBrowser: true` remains a priority investigation area, not proof of an actor capability.
+- **A5 — Adapter faults: OUTSIDE A.** Retain as a candidate failure class / route source. If an in-scope actor can induce or exploit an adapter fault, model that actor capability separately and preserve the causal chain.
 
-The trial owner must determine which candidate capabilities belong in A, which assumptions and trust boundaries apply, and which capabilities are excluded. In particular, the presence of a `sameBrowser: true` path is not itself proof that an attacker can exploit it or that it must be included in the final attacker model.
+**Accepted exclusions:** direct compromise of the merchant backend/payment processor independent of Browsa; unrestricted administrative compromise of the target host/OS or deployment operator; and physical access. If discovery identifies routes relying on these excluded capabilities, retain them as Out of scope with the applicable rationale.
 
 ### 5.4 System Model (M)
 
@@ -77,7 +77,9 @@ The up-front mandate mechanism is initially treated as an authorised alternative
 
 ### 5.5 Evidence Scope (S)
 
-The preliminary evidence scope includes:
+**Status: OWNER ACCEPTED — pinned-source + local-reproduction assessment (2026-11-22).** This scope is not expanded to production/deployment assessment or merchant-side commitment evidence.
+
+The accepted evidence scope includes:
 
 - Static source inspection at the pinned revision.
 - Call-graph and interface-path analysis.
@@ -95,7 +97,7 @@ Accordingly:
 - Source-level structural evidence must be distinguished from simulated test evidence and deployment-specific evidence.
 - Evidence of an actual merchant-side effect must be distinguished from evidence that the local application reports success.
 
-The absence of a real merchant checkout demonstration limits the strength of any positive conformance conclusion. The available evidence must be evaluated against the final attacker model, deployment assumptions, and Protected Effect.
+The absence of a real merchant checkout demonstration limits the strength of any positive conformance conclusion. Under the accepted S, a target-level CONFORMS conclusion for merchant-side E is not supportable solely from source inspection and local simulation. Unless implementation/deployment assumptions and E are independently established, the target-level result remains INSUFFICIENT_EVIDENCE. Any future expansion of S requires a separate explicit decision before preregistration freeze.
 
 ### 5.6 Priority Open Questions
 
