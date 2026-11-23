@@ -1,7 +1,7 @@
 # ARD-TRIAL-01-SATURATION.md
 
 **Title:** ARD Trial 1 — Saturation and Counting Rules  
-**Status:** PROPOSED — PENDING TRIAL OWNER APPROVAL  
+**Status:** OWNER APPROVED — PREREGISTRATION CANDIDATE  
 **Version:** 0.1  
 **Applies to:** ARD-TRIAL-01  
 **Methodological baseline:** ARD-001 v0.3  
